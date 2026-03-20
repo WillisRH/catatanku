@@ -1,0 +1,13 @@
+// Simple schema test
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://9f09ae580ddecc19f3b05b40e31c956d49524614b3428c197cd4dfe3dfa901fc:sk_Ky3WlH9sWfxvCH0I8hLYo@db.prisma.io:5432/postgres?sslmode=require"
+}
+
+model Test {
+  id Int @id @default(autoincrement())
+}

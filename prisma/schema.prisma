@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String?
+  email         String?  @unique
+  password      String?
+  emailVerified DateTime?
+  image         String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  currentStreak  Int      @default(0)
+  longestStreak  Int      @default(0)
+  lastActiveDate String?
+  notes          Note[]
+  fcmTokens      FcmToken[]
+}
+
+model Note {
+  id        String   @id @default(cuid())
+  date      String
+  title     String?
+  text      String?
+  mood      Int?
+  stickers  String[]
+  tags      String[]
+  font      String?
+  ts        BigInt
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isLocked  Boolean  @default(false)
+  isPinned  Boolean  @default(false)
+  color     String?
+  theme     String?
+  shareId   String?  @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model FcmToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
