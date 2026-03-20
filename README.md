@@ -9,8 +9,6 @@ Catatanku adalah aplikasi pencatat jurnal digital yang dirancang dengan estetika
 - **Tema Dinamis & Ambient**: Pilih dari berbagai tema (Cinta, Alam, Galaksi, Kota Malam, dll.) yang mengubah seluruh suasana aplikasi, lengkap dengan latar belakang SVG yang elegan.
 - **Mood Tracking**: Dokumentasikan perasaan Anda setiap hari dengan emoji mood yang intuitif.
 - **Ekspor Cerdas**: Simpan catatan Anda dalam format **PDF** yang rapi (dengan latar belakang tema yang tetap terjaga) atau **TXT**, keduanya dengan penamaan berkas otomatis sesuai judul catatan.
-- **Keamanan Passkey**: Login modern dan aman menggunakan otentikasi biometrik (Windows Hello, Fingerprint, FaceID).
-- **Asisten AI (Gemini)**: Integrasi dengan Google Gemini untuk membantu Anda merangkum atau memperluas konten catatan.
 - **Desain Responsif**: Pengalaman premium yang konsisten baik di perangkat seluler maupun desktop.
 
 ## 🚀 Teknologi
