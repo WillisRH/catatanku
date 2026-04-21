@@ -5170,6 +5170,22 @@ export default function DiaryApp() {
         "--scroll-thumb":"#A78BFA","--scroll-track":"#362D4A","--scroll-thumb-hover":"#8B6FE8",
         "--surface2":"rgba(255,255,255,0.08)",
       },
+      slate: {
+        "--bg":"#0D1117","--surface":"#161B22","--header-bg":"rgba(13,17,23,0.97)",
+        "--ink":"#E6EDF3","--ink2":"#8B949E","--ink3":"#484F58",
+        "--accent":"#38BDF8","--accent-soft":"rgba(56,189,248,0.14)","--line":"#30363D",
+        "--shadow":"0 2px 24px rgba(0,0,0,0.55)",
+        "--scroll-thumb":"#38BDF8","--scroll-track":"#21262D","--scroll-thumb-hover":"#0EA5E9",
+        "--surface2":"rgba(255,255,255,0.07)",
+      },
+      peach: {
+        "--bg":"#FFF7F3","--surface":"#FFFFFF","--header-bg":"rgba(255,247,243,0.94)",
+        "--ink":"#2D1208","--ink2":"#8A4A34","--ink3":"#C49078",
+        "--accent":"#E8541A","--accent-soft":"#FAD5C0","--line":"#F5CEBC",
+        "--shadow":"0 2px 20px rgba(45,18,8,0.06)",
+        "--scroll-thumb":"#E8541A","--scroll-track":"#FAD5C0","--scroll-thumb-hover":"#C43E08",
+        "--surface2":"rgba(0,0,0,0.06)",
+      },
     };
     const DEFAULT_VARS: Record<string, string> = {
       "--bg":"#FAF6F0","--surface":"#FFFFFF","--header-bg":"rgba(250,246,240,0.93)",
@@ -5683,7 +5699,7 @@ export default function DiaryApp() {
 
   if (status === "unauthenticated") return <AuthForm />;
 
-  const isDarkApp = appTheme === "dark" || appTheme === "violet";
+  const isDarkApp = appTheme === "dark" || appTheme === "violet" || appTheme === "slate";
 
   const isReadingDarkTheme = (view==="read"||view==="write") && !!(readNoteTheme as any)?.dark;
   const isReadingLightTheme = (view==="read"||view==="write") && !!(readNoteTheme?.bg || readNoteColor?.bg) && !(readNoteTheme as any)?.dark;
@@ -7838,27 +7854,73 @@ export default function DiaryApp() {
                 {/* ── Global App Theme ── */}
                 <div style={{marginBottom:32}}>
                   <p style={{fontFamily:"'Lora',serif",fontSize:".82rem",color:"var(--ink2)",marginBottom:14,fontWeight:500,letterSpacing:".02em"}}>Tema Warna Aplikasi</p>
-                  <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(100px,1fr))",gap:10}}>
+                  <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(108px,1fr))",gap:10}}>
                     {([
                       { id:"default", label:"Cokelat Hangat", bg:"#FAF6F0", surface:"#FFFFFF", accent:"#C4956A", line:"#EDE7DF", ink:"#2E2520" },
                       { id:"sage",    label:"Sage Hijau",     bg:"#F2F7F4", surface:"#FFFFFF", accent:"#4A8A64", line:"#D0E4D8", ink:"#1E2E24" },
-                      { id:"dark",    label:"One Dark",       bg:"#282C34", surface:"#21252B", accent:"#61AFEF", line:"#3E4451", ink:"#ABB2BF" },
                       { id:"ocean",   label:"Biru Laut",      bg:"#EDF6FF", surface:"#FFFFFF", accent:"#3D7FBF", line:"#B4CCE8", ink:"#1A2E42" },
+                      { id:"peach",   label:"Sorbet Persik",  bg:"#FFF7F3", surface:"#FFFFFF", accent:"#E8541A", line:"#F5CEBC", ink:"#2D1208" },
+                      { id:"dark",    label:"One Dark",       bg:"#282C34", surface:"#21252B", accent:"#61AFEF", line:"#3E4451", ink:"#ABB2BF" },
                       { id:"violet",  label:"Malam Ungu",     bg:"#1A1525", surface:"#221D30", accent:"#A78BFA", line:"#362D4A", ink:"#E5E0F8" },
+                      { id:"slate",   label:"Granit Biru",    bg:"#0D1117", surface:"#161B22", accent:"#38BDF8", line:"#30363D", ink:"#E6EDF3" },
                     ] as const).map(t => {
                       const isAct = appTheme === t.id;
+                      const icon: Record<string, JSX.Element> = {
+                        default: (
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={t.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M17 8h1a4 4 0 010 8h-1"/><path d="M3 8h14v9a4 4 0 01-4 4H7a4 4 0 01-4-4V8z"/><path d="M6 2v2M10 2v2M14 2v2"/>
+                          </svg>
+                        ),
+                        sage: (
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={t.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M12 22V12"/><path d="M5 12C5 6 12 3 20 6c-2 6-8 8-15 6z"/>
+                          </svg>
+                        ),
+                        ocean: (
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={t.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M2 10c2-3.5 5-3.5 7 0s5 3.5 7 0M2 17c2-3.5 5-3.5 7 0s5 3.5 7 0"/>
+                          </svg>
+                        ),
+                        peach: (
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={t.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/>
+                          </svg>
+                        ),
+                        dark: (
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={t.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                          </svg>
+                        ),
+                        violet: (
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={t.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                          </svg>
+                        ),
+                        slate: (
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={t.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                            <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="8.5" x2="22" y2="8.5"/>
+                          </svg>
+                        ),
+                      };
                       return (
                         <button key={t.id} onClick={()=>setAppTheme(t.id)}
-                          style={{display:"flex",flexDirection:"column",gap:8,padding:"14px 12px",borderRadius:16,border:`2px solid ${isAct?t.accent:t.line}`,background:t.bg,cursor:"pointer",textAlign:"left",transition:"all .2s",position:"relative",overflow:"hidden",boxShadow:isAct?`0 0 0 1px ${t.accent}40,0 4px 16px ${t.accent}20`:"none"}}>
+                          style={{display:"flex",flexDirection:"column",gap:8,padding:"12px 11px",borderRadius:16,border:`2px solid ${isAct?t.accent:t.line}`,background:t.bg,cursor:"pointer",textAlign:"left",transition:"all .2s",position:"relative",overflow:"hidden",boxShadow:isAct?`0 0 0 1px ${t.accent}30,0 4px 18px ${t.accent}25`:"none"}}>
                           {/* Mini preview */}
-                          <div style={{width:"100%",height:52,borderRadius:10,background:t.surface,border:`1px solid ${t.line}`,position:"relative",overflow:"hidden"}}>
-                            <div style={{position:"absolute",top:8,left:8,right:8,height:5,borderRadius:3,background:t.line}}/>
-                            <div style={{position:"absolute",top:17,left:8,right:16,height:4,borderRadius:3,background:t.line,opacity:.5}}/>
-                            <div style={{position:"absolute",bottom:8,right:8,width:14,height:14,borderRadius:"50%",background:t.accent}}/>
+                          <div style={{width:"100%",height:58,borderRadius:9,background:t.surface,border:`1px solid ${t.line}`,position:"relative",overflow:"hidden"}}>
+                            {/* Accent top stripe */}
+                            <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:t.accent,opacity:.85}}/>
+                            {/* Text lines */}
+                            <div style={{position:"absolute",top:11,left:8,right:28,height:4,borderRadius:3,background:t.line}}/>
+                            <div style={{position:"absolute",top:19,left:8,width:"45%",height:3,borderRadius:3,background:t.line,opacity:.55}}/>
+                            <div style={{position:"absolute",top:27,left:8,width:"60%",height:3,borderRadius:3,background:t.line,opacity:.35}}/>
+                            {/* Theme icon */}
+                            <div style={{position:"absolute",bottom:6,right:6,opacity:.9}}>
+                              {icon[t.id]}
+                            </div>
                           </div>
                           <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-                            <span style={{fontFamily:"'Lora',serif",fontSize:".72rem",color:t.ink,fontWeight:isAct?600:400}}>{t.label}</span>
-                            {isAct && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={t.accent} strokeWidth="3" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>}
+                            <span style={{fontFamily:"'Lora',serif",fontSize:".7rem",color:t.ink,fontWeight:isAct?600:400,lineHeight:1.3}}>{t.label}</span>
+                            {isAct && <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={t.accent} strokeWidth="3.5" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>}
                           </div>
                         </button>
                       );
