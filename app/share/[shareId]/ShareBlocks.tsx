@@ -18,24 +18,36 @@ function parseLineStyle(line: string): { align: "left" | "center" | "right"; tex
   return { align: "left", text: line };
 }
 
-function renderInline(raw: string): React.ReactNode {
-  if (!raw.includes("**") && !raw.includes("_")) return raw;
+function renderInline(raw: string, titleMap: Record<string, string> = {}): React.ReactNode {
+  const hasMarkup = raw.includes('**') || raw.includes('_') || raw.includes('<u>') ||
+    raw.includes('~~') || raw.includes('`') || raw.includes('[') || raw.includes('[[');
+  if (!hasMarkup) return raw;
   const parts: React.ReactNode[] = [];
-  const re = /\*\*(.+?)\*\*|_(.+?)_/g;
+  const re = /\[\[(.+?)\]\]|\*\*\*(.+?)\*\*\*|\*\*(.+?)\*\*|~~(.+?)~~|`([^`]+)`|\[([^\]]+)\]\((https?:\/\/[^\)]+)\)|_(.+?)_|<u>(.+?)<\/u>/g;
   let last = 0; let m: RegExpExecArray | null;
   while ((m = re.exec(raw)) !== null) {
     if (m.index > last) parts.push(raw.slice(last, m.index));
-    if (m[1] !== undefined) parts.push(<strong key={m.index} style={{ fontWeight: 700 }}>{m[1]}</strong>);
-    else parts.push(<em key={m.index} style={{ fontStyle: "italic" }}>{m[2]}</em>);
+    if (m[1] !== undefined) {
+      const title = m[1];
+      const sid = titleMap[title.toLowerCase().trim()];
+      parts.push(sid ? <a key={m.index} href={`/share/${sid}`} className="note-link clickable">{title}</a> : <span key={m.index} className="note-link">{title}</span>);
+    }
+    else if (m[2] !== undefined) parts.push(<strong key={m.index}><em>{m[2]}</em></strong>);
+    else if (m[3] !== undefined) parts.push(<strong key={m.index} style={{fontWeight:700}}>{m[3]}</strong>);
+    else if (m[4] !== undefined) parts.push(<s key={m.index} style={{opacity:0.6}}>{m[4]}</s>);
+    else if (m[5] !== undefined) parts.push(<code key={m.index} style={{background:'var(--surface2,rgba(0,0,0,0.06))',borderRadius:4,padding:'1px 5px',fontFamily:'monospace',fontSize:'0.88em'}}>{m[5]}</code>);
+    else if (m[6] !== undefined) parts.push(<a key={m.index} href={m[7]} target="_blank" rel="noopener noreferrer" style={{color:'var(--accent)',textDecoration:'underline'}}>{m[6]}</a>);
+    else if (m[8] !== undefined) parts.push(<em key={m.index} style={{fontStyle:'italic'}}>{m[8]}</em>);
+    else parts.push(<u key={m.index}>{m[9]}</u>);
     last = m.index + m[0].length;
   }
   if (last < raw.length) parts.push(raw.slice(last));
-  if (parts.length === 0) return "";
+  if (parts.length === 0) return '';
   if (parts.length === 1) return parts[0];
   return <>{parts}</>;
 }
 
-export default function ShareBlocks({ blocks, accent, fontFamily = "'Lora', serif", isDark = false, themeId }: { blocks: SBlock[]; accent: string; fontFamily?: string; isDark?: boolean; themeId?: string }) {
+export default function ShareBlocks({ blocks, accent, titleMap = {}, fontFamily = "'Lora', serif", isDark = false, themeId }: { blocks: SBlock[]; accent: string; titleMap?: Record<string, string>; fontFamily?: string; isDark?: boolean; themeId?: string }) {
   const isKM = themeId === 'kota_malam';
   const inkColor = isKM ? "#FFFFFF" : isDark ? "rgba(228,248,246,.92)" : "#2E2520";
   const ink2Color = isKM ? "rgba(255,255,255,.85)" : isDark ? "rgba(168,228,222,.90)" : "#8C7E73";
@@ -43,8 +55,23 @@ export default function ShareBlocks({ blocks, accent, fontFamily = "'Lora', seri
   const dividerColor = isKM ? "rgba(255,255,255,.12)" : isDark ? "rgba(255,255,255,.10)" : "rgba(0,0,0,0.07)";
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
 
+  const grayColor = isDark ? 'rgba(255,255,255,0.45)' : '#999';
+  const grayBorder = isDark ? 'rgba(255,255,255,0.3)' : '#ccc';
+
   return (
     <>
+      <style>{`
+        .rich-read h1{font-size:1.7rem;font-weight:700;margin-top:1.2em;margin-bottom:.2em;line-height:1.25}
+        .rich-read h2{font-size:1.4rem;font-weight:700;margin-top:1em;margin-bottom:.2em;line-height:1.3}
+        .rich-read h3{font-size:1.15rem;font-weight:700;margin-top:.9em;margin-bottom:.15em;line-height:1.35}
+        .rich-read h4{font-size:1.05rem;font-weight:700;margin-top:.8em;margin-bottom:.1em;line-height:1.4}
+        .rich-read strong{font-weight:700}
+        .rich-read em{font-style:italic}
+        .rich-read div{min-height:1.2em}
+        .note-link { color: ${grayColor}; border-bottom: 1.5px dotted ${grayBorder}; cursor: default; transition: all 0.2s; font-weight: 500; text-decoration: none; }
+        .note-link.clickable { color: ${accent}; border-bottom-color: ${accent}80; cursor: pointer; }
+        .note-link.clickable:hover { background: ${accent}15; border-bottom-style: solid; }
+      `}</style>
       {/* Lightbox */}
       {lightboxUrl && (
         <div
@@ -130,7 +157,7 @@ export default function ShareBlocks({ blocks, accent, fontFamily = "'Lora', seri
                 {blk.done && <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
               </div>
               <span style={{ fontFamily, fontSize: "1rem", lineHeight: 1.7, color: blk.done ? ink2Color : inkColor, textDecoration: blk.done ? "line-through" : "none" }}>
-                {renderInline(blk.content)}
+                {renderInline(blk.content, titleMap)}
               </span>
             </div>
           );
@@ -182,28 +209,59 @@ export default function ShareBlocks({ blocks, accent, fontFamily = "'Lora', seri
           );
         }
         // text block — HTML (new) or plain markdown (legacy)
-        if (/<(?:div|br|strong|em|span)\b/i.test(blk.content)) {
+        if (/<(?:div|br|strong|em|span|u)\b/i.test(blk.content)) {
           return (
             <div
               key={bi}
               className="rich-read"
               style={{ fontFamily, fontSize: "1.05rem", lineHeight: 2.1, color: inkColor }}
-              dangerouslySetInnerHTML={{ __html: blk.content }}
+              dangerouslySetInnerHTML={{ __html: blk.content.replace(/\[\[(.*?)\]\]/g, (match, title) => {
+                const sid = titleMap[title.toLowerCase().trim()];
+                return sid ? `<a href="/share/${sid}" class="note-link clickable">${title}</a>` : `<span class="note-link">${title}</span>`;
+              }) }}
             />
           );
         }
-        return blk.content.split("\n").map((line, li) => {
-          if (!line) return <div key={`${bi}-${li}`} style={{ height: "1rem" }} />;
-          const { align, text } = parseLineStyle(line);
-          return (
-            <p
-              key={`${bi}-${li}`}
-              style={{ fontFamily, fontSize: "1.05rem", lineHeight: 2.1, color: inkColor, marginBottom: 0, textAlign: align }}
-            >
-              {renderInline(text)}
-            </p>
-          );
-        });
+        return (
+          <div key={bi} className="rich-read">
+            {blk.content.split("\n").map((line, li) => {
+              if (!line) return <div key={`${bi}-${li}`} style={{ height: "1.1rem" }} />;
+              const { align, text } = parseLineStyle(line);
+              const bMatch = text.match(/^(\s*)([-*•])\s(.*)/);
+              const nMatch = text.match(/^(\s*)(\d+)\.\s(.*)/);
+              const hMatch = text.match(/^(\s*)(#+)\s(.*)/);
+              if (hMatch) {
+                const level = Math.min(6, hMatch[2].length);
+                const Tag = `h${level}` as any;
+                return <Tag key={`${bi}-${li}`} style={{ fontFamily, color: inkColor, textAlign: align, wordBreak: "break-word" }}>{renderInline(hMatch[3], titleMap)}</Tag>;
+              }
+              if (bMatch) {
+                return (
+                  <div key={`${bi}-${li}`} style={{ display: "flex", gap: 8, textAlign: align, marginBottom: 4 }}>
+                    <span style={{ opacity: 0.45, flexShrink: 0 }}>{bMatch[2]}</span>
+                    <span style={{ flex: 1 }}>{renderInline(bMatch[3], titleMap)}</span>
+                  </div>
+                );
+              }
+              if (nMatch) {
+                return (
+                  <div key={`${bi}-${li}`} style={{ display: "flex", gap: 8, textAlign: align, marginBottom: 4 }}>
+                    <span style={{ opacity: 0.45, flexShrink: 0, minWidth: "1.2em" }}>{nMatch[2]}.</span>
+                    <span style={{ flex: 1 }}>{renderInline(nMatch[3], titleMap)}</span>
+                  </div>
+                );
+              }
+              return (
+                <p
+                  key={`${bi}-${li}`}
+                  style={{ fontFamily, fontSize: "1.05rem", lineHeight: 2.1, color: inkColor, marginBottom: 0, textAlign: align }}
+                >
+                  {renderInline(text, titleMap)}
+                </p>
+              );
+            })}
+          </div>
+        );
       })}
     </>
   );

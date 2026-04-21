@@ -25,12 +25,14 @@ export async function GET() {
       const rawText  = decrypt(note.text  || '');
       const titleWords = rawTitle.trim() ? rawTitle.trim().split(/\s+/).length : 0;
       const textWords  = rawText.trim()  ? rawText.trim().split(/\s+/).filter(Boolean).length : 0;
-      return { id: note.id, date: note.date, mood: note.mood, stickers: note.stickers, ts: Number(note.ts), isLocked: true, title: '', text: '', userId: note.userId, createdAt: note.createdAt, updatedAt: note.updatedAt, isPinned: (note as any).isPinned || false, color: (note as any).color || '', theme: (note as any).theme || '', shareId: (note as any).shareId || null, tags: (note as any).tags || [], font: (note as any).font || null, titleWords, textWords };
+      return { id: note.id, date: note.date, mood: note.mood, stickers: note.stickers, ts: Number(note.ts), isLocked: true, lockType: (note as any).lockType ?? 'password', title: '', text: '', userId: note.userId, createdAt: note.createdAt, updatedAt: note.updatedAt, isPinned: (note as any).isPinned || false, isProfilePinned: (note as any).isProfilePinned || false, color: (note as any).color || '', theme: (note as any).theme || '', shareId: (note as any).shareId || null, isOneTime: (note as any).isOneTime || false, isModerated: (note as any).isModerated || false, tags: (note as any).tags || [], font: (note as any).font || null, titleWords, textWords };
     }
     return { ...note, title: decrypt(note.title || ''), text: decrypt(note.text || ''), ts: Number(note.ts), theme: (note as any).theme || '' };
   });
 
-  return NextResponse.json(decryptedNotes);
+  return NextResponse.json(decryptedNotes, {
+    headers: { "Cache-Control": "private, no-store" },
+  });
 }
 
 export async function POST(req: Request) {
@@ -38,9 +40,19 @@ export async function POST(req: Request) {
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   if (!checkCsrf(req, session.user.id)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const { id, date, title, text, mood, stickers, ts, isLocked, isPinned, color, theme, tags, font } = await req.json();
+  const { id, date, title, text, mood, stickers, ts, isLocked, isPinned, isProfilePinned, color, theme, tags, font, songId, songTitle, songArtwork, songPreview, shareMusic, lat, lng } = await req.json();
 
   try {
+    // If ID is provided, verify ownership first to prevent IDOR
+    if (id && id !== 'new') {
+      const existing = await prisma.note.findUnique({
+        where: { id }
+      });
+      if (existing && existing.userId !== session.user.id) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+    }
+
     const note = await prisma.note.upsert({
       where: { id: id || 'new' },
       update: {
@@ -52,6 +64,8 @@ export async function POST(req: Request) {
         // @ts-ignore
         isPinned,
         // @ts-ignore
+        isProfilePinned,
+        // @ts-ignore
         color,
         // @ts-ignore
         theme,
@@ -60,11 +74,25 @@ export async function POST(req: Request) {
         tags: tags || [],
         // @ts-ignore
         font: font || null,
+        // @ts-ignore
+        songId: songId || null,
+        // @ts-ignore
+        songTitle: songTitle || null,
+        // @ts-ignore
+        songArtwork: songArtwork || null,
+        // @ts-ignore
+        songPreview: songPreview || null,
+        // @ts-ignore
+        shareMusic: shareMusic ?? true,
+        // @ts-ignore
+        lat: lat ?? null,
+        // @ts-ignore
+        lng: lng ?? null,
         ts: BigInt(ts || Date.now()),
         date
       },
       create: {
-        id: id || undefined,
+        id: id && id !== 'new' ? id : undefined,
         date,
         title: encrypt(title || ''),
         text: encrypt(text || ''),
@@ -74,6 +102,8 @@ export async function POST(req: Request) {
         // @ts-ignore
         isPinned,
         // @ts-ignore
+        isProfilePinned,
+        // @ts-ignore
         color,
         // @ts-ignore
         theme,
@@ -82,6 +112,20 @@ export async function POST(req: Request) {
         tags: tags || [],
         // @ts-ignore
         font: font || null,
+        // @ts-ignore
+        songId: songId || null,
+        // @ts-ignore
+        songTitle: songTitle || null,
+        // @ts-ignore
+        songArtwork: songArtwork || null,
+        // @ts-ignore
+        songPreview: songPreview || null,
+        // @ts-ignore
+        shareMusic: shareMusic ?? true,
+        // @ts-ignore
+        lat: lat ?? null,
+        // @ts-ignore
+        lng: lng ?? null,
         ts: BigInt(ts || Date.now()),
         userId: session.user.id
       }

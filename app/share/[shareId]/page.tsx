@@ -1,13 +1,16 @@
-import { prisma } from "@/lib/prisma";
 import { decrypt } from "@/lib/encryption";
-import type { Metadata, Viewport } from "next";
+import ShareMusicPlayer from "./ShareMusicPlayer";
+import { calcReadingTime } from "@/lib/note-utils";
+import { Metadata, Viewport } from "next";
 import ShareBlocks from "./ShareBlocks";
+import { prisma } from "@/lib/prisma";
+import ShareRevokeClient from "./ShareRevokeClient";
 
 export async function generateMetadata({ params }: { params: Promise<{ shareId: string }> }): Promise<Metadata> {
   const { shareId } = await params;
   // @ts-ignore
-  const note = await prisma.note.findUnique({ where: { shareId } as any });
-  if (!note || (note as any).isLocked) {
+  const note = await prisma.note.findFirst({ where: { OR: [{ shareId }, { id: shareId, isProfilePinned: true }] } as any });
+  if (!note || (note as any).isLocked || (note as any).isModerated) {
     return { title: "Catatanku", description: "Baca catatan di Catatanku." };
   }
   const title = decrypt(note.title || "");
@@ -20,18 +23,21 @@ export async function generateMetadata({ params }: { params: Promise<{ shareId: 
     .replace(/\s+/g, " ")
     .trim()
     .slice(0, 160);
+  const rt = calcReadingTime(rawText);
+  const rtText = `${rt} mnt baca`;
+
   return {
-    title: title ? `${title} — Catatanku` : "Catatanku",
+    title: title ? `${title} — ${rtText} — Catatanku` : `Catatanku — ${rtText}`,
     description: description || "Baca catatan di Catatanku.",
     openGraph: {
-      title: title || "Catatanku",
+      title: title ? `${title} — ${rtText}` : `Catatanku — ${rtText}`,
       description: description || "Baca catatan di Catatanku.",
       type: "article",
       siteName: "Catatanku",
     },
     twitter: {
       card: "summary_large_image",
-      title: title || "Catatanku",
+      title: title ? `${title} — ${rtText}` : `Catatanku — ${rtText}`,
       description: description || "Baca catatan di Catatanku.",
     },
   };
@@ -40,8 +46,8 @@ export async function generateMetadata({ params }: { params: Promise<{ shareId: 
 export async function generateViewport({ params }: { params: Promise<{ shareId: string }> }): Promise<Viewport> {
   const { shareId } = await params;
   // @ts-ignore
-  const note = await prisma.note.findUnique({ where: { shareId } as any });
-  if (!note || (note as any).isLocked) {
+  const note = await prisma.note.findFirst({ where: { OR: [{ shareId }, { id: shareId, isProfilePinned: true }] } as any });
+  if (!note || (note as any).isLocked || (note as any).isModerated) {
     return { themeColor: "#FAF6F0" };
   }
   const themeKey = (note as any).theme as string || '';
@@ -99,10 +105,11 @@ const NOTE_THEMES: Record<string, { bg: string; accent: string; svg: string; dar
   kota_malam: { bg: '#0A0E14', accent: '#F0D090', svg: 'kota_malam', dark: true },
   kucing:    { bg: '#FAF7F4', accent: '#C28B68', svg: 'kucing' },
   notebook:  { bg: '#FFFAEC', accent: '#9B7A38', svg: 'notebook' },
+  eid:       { bg: '#F3FBF5', accent: '#2E7D52', svg: 'eid' },
 };
 
 function ThemeSvg({ themeId, accent }: { themeId: string; accent: string }) {
-  const s = { position:"absolute" as const, top:0, left:0, width:"100%", height:"100%", pointerEvents:"none" as const, zIndex:0, overflow:"hidden" as const };
+  const s = { position:"fixed" as const, top:0, left:0, width:"100%", height:"100%", pointerEvents:"none" as const, zIndex:0, overflow:"hidden" as const };
   if (themeId==='cinta') return (
     <svg style={{...s,opacity:.1}} viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" fill={accent}>
       {[[30,60,1],[320,40,1.4],[180,150,.7],[50,300,1.1],[360,280,.8],[200,450,1.3],[80,550,.6],[340,500,1],[150,680,.9],[290,730,1.2]].map(([x,y,sc]:number[],i)=>(
@@ -418,6 +425,74 @@ function ThemeSvg({ themeId, accent }: { themeId: string; accent: string }) {
       <g transform="translate(225,505)" fill="none" stroke={accent} strokeWidth="1.3" strokeLinecap="round" opacity=".11"><path d="M0,-13C7,-13 13,-7 13,0C13,8 6,14 0,14C-8,14 -15,7 -15,0C-15,-9 -8,-17 0,-17"/><circle cx="0" cy="0" r="5"/></g>
     </svg>
   );
+  if (themeId==='eid') return (
+    <svg style={{ position:"absolute" as const, top:0, left:0, width:"100%", height:"100%", pointerEvents:"none" as const, zIndex:0, overflow:"hidden" as const, opacity:1 }} viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" fill="none">
+      <defs>
+        <style>{`@keyframes eid-tw{0%,100%{opacity:.05}50%{opacity:.22}}@keyframes eid-sway{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}@keyframes eid-glow{0%,100%{opacity:.25}50%{opacity:.7}}@keyframes eid-bulb{0%,100%{opacity:.32}50%{opacity:.85}}`}</style>
+        <filter id="eid-sf" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="3"/></filter>
+        <pattern id="eid-kpat" patternUnits="userSpaceOnUse" width="6" height="6"><line x1="0" y1="0" x2="6" y2="6" stroke={accent} strokeWidth=".55" opacity=".8"/><line x1="6" y1="0" x2="0" y2="6" stroke={accent} strokeWidth=".55" opacity=".8"/></pattern>
+      </defs>
+      {/* Crescent moon */}
+      <g transform="translate(352,145)" opacity=".2"><circle r="30" fill={accent}/><circle cx="10" cy="-7" r="26" fill="#F3FBF5"/></g>
+      {/* Twinkling 6-point stars */}
+      {([[40,135,4.5],[115,118,3.5],[200,145,5.5],[52,215,3.5],[162,200,4.5],[325,185,3],[88,318,4],[252,288,5],[378,278,3.5],[28,480,4],[172,448,3.5],[342,418,4],[78,638,3.5],[222,598,4.5],[362,578,3],[138,728,3.5],[302,718,5]] as number[][]).map(([cx,cy,R]:number[],i:number)=>{
+        const pts=Array.from({length:12},(_:unknown,j:number)=>{const a=(j*30-90)*Math.PI/180;const rr=j%2===0?R:R*.42;return`${cx+Math.cos(a)*rr},${cy+Math.sin(a)*rr}`;}).join(' ');
+        return <polygon key={`es${i}`} points={pts} fill={accent} style={{animation:`eid-tw ${2.5+i*.32}s ease-in-out ${i*.17}s infinite`}} opacity=".16"/>;
+      })}
+      {/* String lights row 1 */}
+      <path d="M-2,112 Q40,137 80,122 Q120,107 160,134 Q200,160 240,140 Q280,120 320,144 Q360,167 402,150" stroke={accent} strokeWidth="1" opacity=".22" fill="none"/>
+      {([[0,117,'#C94B20'],[40,132,accent],[80,124,'#D4920A'],[120,114,'#C94B20'],[160,137,accent],[200,157,'#D4920A'],[240,140,'#C94B20'],[280,122,accent],[320,144,'#D4920A'],[360,164,'#C94B20'],[400,150,accent]] as [number,number,string][]).map(([bx,by,bc],i:number)=>(
+        <g key={`b1${i}`}><ellipse cx={bx} cy={by+7} rx="3" ry="4.5" fill={bc} style={{animation:`eid-bulb ${1.6+i*.4}s ease-in-out ${i*.22}s infinite`}} opacity=".62"/><ellipse cx={bx} cy={by+7} rx="5.5" ry="7" fill={bc} filter="url(#eid-sf)" opacity=".18" style={{animation:`eid-bulb ${1.6+i*.4}s ease-in-out ${i*.22}s infinite`}}/></g>
+      ))}
+      {/* String lights row 2 */}
+      <path d="M-2,240 Q40,265 80,250 Q120,233 160,260 Q200,287 240,267 Q280,247 320,271 Q360,295 402,277" stroke={accent} strokeWidth="1" opacity=".2" fill="none"/>
+      {([[0,245,accent],[40,263,'#D4920A'],[80,252,'#C94B20'],[120,237,accent],[160,263,'#D4920A'],[200,283,'#C94B20'],[240,267,accent],[280,247,'#D4920A'],[320,271,'#C94B20'],[360,293,accent],[400,277,'#D4920A']] as [number,number,string][]).map(([bx,by,bc],i:number)=>(
+        <g key={`b2${i}`}><ellipse cx={bx} cy={by+7} rx="3" ry="4.5" fill={bc} style={{animation:`eid-bulb ${1.8+i*.38}s ease-in-out ${i*.28+.5}s infinite`}} opacity=".55"/><ellipse cx={bx} cy={by+7} rx="5.5" ry="7" fill={bc} filter="url(#eid-sf)" opacity=".16" style={{animation:`eid-bulb ${1.8+i*.38}s ease-in-out ${i*.28+.5}s infinite`}}/></g>
+      ))}
+      {/* Swaying lanterns */}
+      {([[80,120,13,38,'4s',0],[200,108,11,32,'5.5s',1],[330,125,12,36,'3.8s',-1],[55,348,10,28,'4.5s',2],[295,335,11,30,'5s',-2]] as [number,number,number,number,string,number][]).map(([cx,cy,hw,h,dur,di]:any,i:number)=>{
+        const lc:string=['#C94B20','#D4920A',accent][i%3];
+        const del=`${Math.abs(di)*.55}s`;
+        const by=22+h/2;
+        return (
+          <g key={`el${i}`} transform={`translate(${cx},${cy})`}>
+            <g style={{transformBox:'fill-box',transformOrigin:'50% 0%',animation:`eid-sway ${dur} ease-in-out ${del} infinite`} as any}>
+              <line x1="0" y1="0" x2="0" y2="18" stroke={lc} strokeWidth="1" opacity=".28"/>
+              <rect x={-hw*.8} y={18} width={hw*1.6} height="5" rx="2" fill={lc} opacity=".22"/>
+              <rect x={-hw} y={22} width={hw*2} height={h} rx={hw*.35} fill={lc} opacity=".13"/>
+              <rect x={-hw} y={22} width={hw*2} height={h} rx={hw*.35} stroke={lc} strokeWidth="1.2" fill="none" opacity=".22"/>
+              <ellipse cx="0" cy={by} rx={hw*.55} ry={h*.3} fill={lc} filter="url(#eid-sf)" style={{animation:`eid-glow ${dur} ease-in-out ${del} infinite`} as any} opacity=".28"/>
+              <line x1={-hw*.9} y1={22+h/3} x2={hw*.9} y2={22+h/3} stroke={lc} strokeWidth=".7" opacity=".22"/>
+              <line x1={-hw*.9} y1={22+h*2/3} x2={hw*.9} y2={22+h*2/3} stroke={lc} strokeWidth=".7" opacity=".22"/>
+              <rect x={-hw*.8} y={22+h} width={hw*1.6} height="4" rx="2" fill={lc} opacity=".2"/>
+              {Array.from({length:7},(_:unknown,k:number)=>{const fx=-hw*.75+k*(hw*1.5/6);return <line key={k} x1={fx} y1={22+h+4} x2={fx+(k%2===0?1:-1)} y2={22+h+14} stroke={lc} strokeWidth=".9" opacity=".22"/>;})}</g></g>
+        );
+      })}
+      {/* Ketupat */}
+      {([[38,310,18],[375,280,15],[108,535,16],[345,510,14],[192,705,15]] as number[][]).map(([cx,cy,r]:number[],i:number)=>{
+        const d=`${cx},${cy-r} ${cx+r},${cy} ${cx},${cy+r} ${cx-r},${cy}`;
+        return (<g key={`ktp${i}`}><polygon points={d} fill="url(#eid-kpat)" opacity=".18"/><polygon points={d} fill={accent} opacity=".05"/><polygon points={d} stroke={accent} strokeWidth="1" fill="none" opacity=".18"/></g>);
+      })}
+      {/* Mosque silhouette */}
+      <g transform="translate(0,622)" opacity=".07" fill={accent}>
+        <rect x="75" y="68" width="250" height="130" rx="2"/>
+        <ellipse cx="200" cy="68" rx="58" ry="38"/><ellipse cx="118" cy="85" rx="33" ry="21"/><ellipse cx="282" cy="85" rx="33" ry="21"/>
+        <rect x="38" y="22" width="22" height="148" rx="3"/><ellipse cx="49" cy="22" rx="11" ry="7"/><line x1="49" y1="8" x2="49" y2="22" stroke={accent} strokeWidth="2.5"/>
+        <rect x="340" y="22" width="22" height="148" rx="3"/><ellipse cx="351" cy="22" rx="11" ry="7"/><line x1="351" y1="8" x2="351" y2="22" stroke={accent} strokeWidth="2.5"/>
+        <rect x="95" y="98" width="15" height="22" rx="7.5"/><rect x="125" y="98" width="15" height="22" rx="7.5"/>
+        <rect x="188" y="90" width="24" height="28" rx="12"/><rect x="260" y="98" width="15" height="22" rx="7.5"/><rect x="290" y="98" width="15" height="22" rx="7.5"/>
+      </g>
+      {/* Sparkles */}
+      {([[155,105],[300,135],[30,380],[375,368],[198,405],[62,698],[348,692]] as number[][]).map(([cx,cy]:number[],i:number)=>(
+        <g key={`sp${i}`} transform={`translate(${cx},${cy})`} style={{animation:`eid-tw ${3+i*.45}s ease-in-out ${i*.38}s infinite`} as any} opacity=".15">
+          <line x1="0" y1="-5" x2="0" y2="5" stroke={accent} strokeWidth=".9"/>
+          <line x1="-5" y1="0" x2="5" y2="0" stroke={accent} strokeWidth=".9"/>
+          <line x1="-3.5" y1="-3.5" x2="3.5" y2="3.5" stroke={accent} strokeWidth=".6"/>
+          <line x1="3.5" y1="-3.5" x2="-3.5" y2="3.5" stroke={accent} strokeWidth=".6"/>
+        </g>
+      ))}
+    </svg>
+  );
   return null;
 }
 
@@ -548,14 +623,33 @@ function LockedPage({ bg, accent, themeKey, theme }: { bg: string; accent: strin
 export default async function SharePage({ params }: { params: Promise<{ shareId: string }> }) {
   const { shareId } = await params;
   // @ts-ignore
-  const note = await prisma.note.findUnique({ where: { shareId } as any });
-  if (!note) return <NotFoundPage />;
+  const note = await prisma.note.findFirst({ where: { OR: [{ shareId }, { id: shareId, isProfilePinned: true }] } as any });
+  if (!note || (note as any).isModerated) return <NotFoundPage />;
 
   const themeKey = (note as any).theme as string || '';
   const theme = themeKey ? NOTE_THEMES[themeKey] : null;
   const c = theme ?? (NOTE_COLORS[(note as any).color || ''] || NOTE_COLORS['']);
   const isDark = !!(theme?.dark);
   const mood = note.mood != null ? MOODS[note.mood] : null;
+
+  // Resolve linked notes (Zettelkasten) for the public view
+  const otherShared = await (prisma.note.findMany as any)({
+    where: {
+      userId: note.userId,
+      shareId: { not: null },
+      isLocked: false,
+      isModerated: false,
+    },
+    select: { title: true, shareId: true }
+  });
+
+  const titleMap: Record<string, string> = {};
+  otherShared.forEach((n: any) => {
+    const decTitle = decrypt(n.title || "").toLowerCase().trim();
+    if (n.shareId && decTitle) {
+      titleMap[decTitle] = n.shareId;
+    }
+  });
 
   if ((note as any).isLocked) {
     return <LockedPage bg={c.bg} accent={c.accent} themeKey={themeKey} theme={theme} />;
@@ -631,6 +725,8 @@ export default async function SharePage({ params }: { params: Promise<{ shareId:
           display:grid;
           grid-template-columns:220px 1fr;
           min-height:100vh;
+          position:relative;
+          z-index:1;
         }
 
         /* ── Aside ── */
@@ -717,15 +813,7 @@ export default async function SharePage({ params }: { params: Promise<{ shareId:
           color:#1C1814;
           line-height:1.22;
           letter-spacing:-.01em;
-          margin-bottom:0;
-        }
-        .sp-title-divider{
-          width:100%;height:1px;
-          background:rgba(0,0,0,.09);
-          margin:28px 0;
-        }
-        .sp-title-divider-notitle{
-          display:none;
+          margin-bottom:28px;
         }
 
         /* ── Mobile footer (hidden desktop) ── */
@@ -796,28 +884,53 @@ export default async function SharePage({ params }: { params: Promise<{ shareId:
         .sp-title{color:${themeKey==='kota_malam'?'#FFFFFF':'rgba(228,248,246,.92)'}}
         .sp-aside-date{color:${themeKey==='kota_malam'?'rgba(255,255,255,.75)':'rgba(160,218,214,.72)'}}
         .sp-mood{color:${themeKey==='kota_malam'?'rgba(255,255,255,.85)':'rgba(200,240,238,.78)'};background:rgba(255,255,255,.08)}
-        .sp-title-divider{background:rgba(255,255,255,.12)}
         .sp-aside{background:rgba(255,255,255,.05);border-right:1px solid rgba(255,255,255,.08)}
         .sp-footer-mob{border-top:1px solid rgba(255,255,255,.10)}
         .sp-aside-top-sep{background:rgba(255,255,255,.10)!important}
         `:""}
+        /* ── Focus mode ── */
+        #sp-root.sp-focus .sp-aside{display:none!important}
+        #sp-root.sp-focus .sp-layout{display:block}
+        #sp-root.sp-focus .sp-main-inner{max-width:680px;padding:60px 40px 120px}
+        @media(max-width:600px){#sp-root.sp-focus .sp-main-inner{padding:48px 22px 120px}}
+        @keyframes spFocusIn{from{opacity:0}to{opacity:1}}
+        #sp-root.sp-focus{animation:spFocusIn .3s ease both}
       `}</style>
 
       {theme && <ThemeSvg themeId={themeKey} accent={theme.accent}/>}
+      {/* <ShareFocusBtn accent={c.accent}/> */}
 
-      <div className="sp-layout" style={{position:"relative",zIndex:1}}>
+      <div id="sp-root" className="sp-layout" style={{position:"relative",zIndex:1}}>
 
         {/* ── Left aside ── */}
         <aside className="sp-aside sp-a sp-a1">
           <div className="sp-aside-inner">
             <div className="sp-brand">Catatanku</div>
             <div className="sp-aside-bar"/>
-            <span className="sp-aside-date">{fullD(note.date)}</span>
+              <span className="sp-aside-date">
+                {fullD(note.date)}
+                <span style={{opacity:.5,margin:"0 6px"}}>·</span>
+                {calcReadingTime(text)} mnt baca
+              </span>
             {mood && (
               <div className="sp-mood">
                 <span>{mood.emoji}</span>
                 <span>{mood.label}</span>
               </div>
+            )}
+            {(note as any).isImported && (
+              <div className="sp-mood" style={{marginTop:8,marginRight:8,background:isDark?"rgba(255,255,255,0.08)":"rgba(196,149,106,.06)",border:isDark?`1px solid ${c.accent}40`:"1px solid rgba(196,149,106,.12)",color:isDark?c.accent:"#8C7E73"}}>
+                <span style={{fontSize:".75rem"}}>📦</span>
+                <span style={{fontWeight:500,fontSize:".7rem"}}>Catatan Impor</span>
+              </div>
+            )}
+            {(note as any).songId && (note as any).shareMusic !== false && (
+              <ShareMusicPlayer
+                songId={(note as any).songId}
+                previewUrl={(note as any).songPreview || ""}
+                artwork={(note as any).songArtwork || ""}
+                title={(note as any).songTitle || "Lagu"}
+              />
             )}
             {/* Mobile: thin line below header row */}
             <div className="sp-aside-top-sep"/>
@@ -835,11 +948,11 @@ export default async function SharePage({ params }: { params: Promise<{ shareId:
         {/* ── Right main content ── */}
         <main className="sp-main">
           <div className="sp-main-inner">
+            <ShareRevokeClient shareId={shareId} isOneTime={!!(note as any).isOneTime}/>
             <div className="sp-accent-bar sp-a sp-a1"/>
             {title && <h1 className="sp-title sp-a sp-a2">{title}</h1>}
-            <div className={title ? "sp-title-divider sp-a sp-a3" : "sp-title-divider-notitle"}/>
             <div className="sp-a sp-a3">
-              <ShareBlocks blocks={blocks} accent={c.accent} fontFamily={fontFamily} isDark={isDark} themeId={themeKey}/>
+              <ShareBlocks blocks={blocks} accent={c.accent} fontFamily={fontFamily} isDark={isDark} themeId={themeKey} titleMap={titleMap}/>
             </div>
 
             {/* Mobile-only footer */}

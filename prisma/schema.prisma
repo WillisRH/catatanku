@@ -8,42 +8,84 @@ datasource db {
 }
 
 model User {
-  id            String   @id @default(cuid())
-  name          String?
-  email         String?  @unique
-  password      String?
-  emailVerified DateTime?
-  image         String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  currentStreak  Int      @default(0)
-  longestStreak  Int      @default(0)
+  id             String     @id @default(cuid())
+  name           String?
+  username       String?    @unique
+  email          String?    @unique
+  password       String?
+  emailVerified  DateTime?
+  image          String?
+  profileTheme   String?    @default("cocoa")
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  currentStreak  Int        @default(0)
+  longestStreak  Int        @default(0)
   lastActiveDate String?
   notes          Note[]
   fcmTokens      FcmToken[]
+  accounts       Account[]
+  sessions       Session[]
+  medals         String[]   @default([])
+  bio            String?
+  instagram      String?
+  twitter        String?
+  tiktok         String?
+  companionType  String     @default("none")
+  companionName  String?
+  displayedMedal String?
+  isPrivate      Boolean    @default(false)
+  role           String     @default("user")
+  isSuspended    Boolean    @default(false)
+  suspendReason  String?
+  suspendNote    String?
 }
 
 model Note {
-  id        String   @id @default(cuid())
-  date      String
-  title     String?
-  text      String?
-  mood      Int?
-  stickers  String[]
-  tags      String[]
-  font      String?
-  ts        BigInt
-  userId    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  isLocked  Boolean  @default(false)
-  isPinned  Boolean  @default(false)
-  color     String?
-  theme     String?
-  shareId   String?  @unique
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id              String   @id @default(cuid())
+  date            String
+  title           String?
+  text            String?
+  mood            Int?
+  stickers        String[]
+  tags            String[]
+  font            String?
+  ts              BigInt
+  userId          String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  isLocked        Boolean  @default(false)
+  lockType        String?  @default("password")
+  notePinHash     String?
+  isPinned        Boolean  @default(false)
+  isProfilePinned Boolean  @default(false)
+  color           String?
+  theme           String?
+  shareId         String?  @unique
+  songId          String?
+  songTitle       String?
+  songArtwork     String?
+  songPreview     String?
+  shareMusic      Boolean  @default(true)
+  isImported      Boolean  @default(false)
+  isOneTime       Boolean  @default(false)
+  isModerated     Boolean  @default(false)
+  lat             Float?
+  lng             Float?
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([userId, ts(sort: Desc)])
+}
+
+model ProfileReaction {
+  id         String   @id @default(cuid())
+  fromUserId String
+  toUserId   String
+  emoji      String
+  createdAt  DateTime @default(now())
+
+  @@unique([fromUserId, toUserId, emoji])
+  @@index([toUserId])
 }
 
 model FcmToken {
@@ -54,4 +96,42 @@ model FcmToken {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+// Required by NextAuth Prisma adapter (OAuth accounts)
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }

@@ -6,7 +6,25 @@ export async function GET(req: Request) {
   if (!url) return NextResponse.json({ error: "Missing url" }, { status: 400 });
 
   try {
-    new URL(url); // validate URL
+    const parsed = new URL(url);
+    // Block non-HTTP protocols (file://, gopher://, ftp://, etc.)
+    if (!['http:', 'https:'].includes(parsed.protocol)) {
+      return NextResponse.json({ error: "Invalid url" }, { status: 400 });
+    }
+    // Block private/internal IP ranges (SSRF protection)
+    const host = parsed.hostname.toLowerCase();
+    if (
+      host === 'localhost' ||
+      /^127\./.test(host) ||
+      /^10\./.test(host) ||
+      /^192\.168\./.test(host) ||
+      /^172\.(1[6-9]|2[0-9]|3[01])\./.test(host) ||
+      /^169\.254\./.test(host) ||
+      /^::1$/.test(host) ||
+      host === '0.0.0.0'
+    ) {
+      return NextResponse.json({ error: "Invalid url" }, { status: 400 });
+    }
   } catch {
     return NextResponse.json({ error: "Invalid url" }, { status: 400 });
   }

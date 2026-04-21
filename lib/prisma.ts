@@ -1,7 +1,22 @@
 import { PrismaClient } from "@prisma/client";
 
-const globalForPrisma = global as unknown as { prisma: PrismaClient };
+declare global {
+  // eslint-disable-next-line no-var
+  var prismaGlobal: PrismaClient | undefined;
+}
 
-export const prisma = globalForPrisma.prisma || new PrismaClient();
+function makePrisma() {
+  const base = process.env.DATABASE_URL ?? "";
+  // Cap connections per process so HMR restarts don't exhaust the pool
+  const url = base.includes("connection_limit")
+    ? base
+    : base + (base.includes("?") ? "&" : "?") + "connection_limit=3&pool_timeout=20";
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+  return new PrismaClient({ datasources: { db: { url } } });
+}
+
+export const prisma = global.prismaGlobal ?? makePrisma();
+
+// Always persist — the old code skipped this in production,
+// which let Turbopack's prod-mode runtime create a new client per request.
+global.prismaGlobal = prisma;

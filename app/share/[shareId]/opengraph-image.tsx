@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import { prisma } from "@/lib/prisma";
 import { decrypt } from "@/lib/encryption";
+import { calcReadingTime } from "@/lib/note-utils";
 
 export const alt = "Catatanku";
 export const size = { width: 1200, height: 630 };
@@ -340,6 +341,8 @@ export default async function OGImage({ params }: { params: Promise<{ shareId: s
           {/* Date + mood */}
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <span style={{ fontSize: 20, color: "#8C7E73", letterSpacing: "0.04em" }}>{dateStr}</span>
+            <span style={{ color: "#C8BCB4", fontSize: 20 }}>·</span>
+            <span style={{ fontSize: 20, color: "#8C7E73" }}>{calcReadingTime(rawText)} mnt baca</span>
             {mood && (
               <>
                 <span style={{ color: "#C8BCB4", fontSize: 20 }}>·</span>

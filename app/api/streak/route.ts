@@ -107,7 +107,7 @@ export async function GET(req: Request) {
     select: { date: true },
   });
 
-  const noteDates = notes.map((n) => n.date);
+  const noteDates = notes.map((n) => n.date).filter((d) => d <= today);
   const result = calculateStreak(noteDates, today);
 
   // Fire-and-forget cache update
