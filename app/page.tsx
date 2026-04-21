@@ -74,6 +74,8 @@ const NOTE_THEMES = [
   { id: 'bunga',    label: 'Bunga',    emoji: '🌸', desc: 'Lembut dan menawan',      bg: '#FDF4FA', accent: '#C05898' },
   { id: 'aurora',   label: 'Aurora',   emoji: '🌌', desc: 'Cahaya utara yang magis', bg: '#0E1C1B', accent: '#4AADA8', dark: true },
   { id: 'kota_malam', label: 'Kota Malam', emoji: '🌃', desc: 'Suasana kota yang hidup di malam hari', bg: '#020408', accent: '#F0D090', dark: true },
+  { id: 'bawah_laut', label: 'Bawah Laut', emoji: '🐠', desc: 'Cahaya bioluminesensi di kedalaman samudra', bg: '#020C14', accent: '#00E5CC', dark: true },
+  { id: 'lavender_field', label: 'Padang Lavender', emoji: '🌷', desc: 'Hamparan bunga ungu yang menenangkan jiwa', bg: '#F4F0FA', accent: '#7C4DCC' },
   { id: 'kucing',   label: 'Kucing',   emoji: '🐱', desc: 'Lucu dan menggemaskan',   bg: '#FAF7F4', accent: '#C28B68' },
   { id: 'notebook', label: 'Notebook', emoji: '📓', desc: 'Bergaris hangat seperti buku catatan', bg: '#FFFAEC', accent: '#9B7A38' },
   { id: 'eid', label: 'Eid', emoji: '🌙', desc: 'Berkah Ramadan & kebahagiaan Idul Fitri', bg: '#F3FBF5', accent: '#2E7D52', seasonal: 'ramadan' },

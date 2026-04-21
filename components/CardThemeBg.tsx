@@ -252,5 +252,72 @@ export const CardThemeBg = memo(function CardThemeBg({ themeId, accent }: { them
       })}
     </svg>
   );
+  if (themeId==='bawah_laut') return (
+    <svg style={{...s,opacity:1}} viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice" fill="none">
+      <defs><style>{`
+        @keyframes bwl-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+        @keyframes bwl-bob2{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+        @keyframes bwl-glow{0%,100%{opacity:.07}50%{opacity:.18}}
+        .bwlj1{animation:bwl-bob 4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+        .bwlj2{animation:bwl-bob2 5.5s ease-in-out infinite 1.2s;transform-box:fill-box;transform-origin:center}
+        .bwlg1{animation:bwl-glow 3s ease-in-out infinite}
+        .bwlg2{animation:bwl-glow 4s ease-in-out infinite .8s}
+      `}</style></defs>
+      <circle cx="40" cy="30" r="22" fill={accent} className="bwlg1"/>
+      <circle cx="262" cy="125" r="18" fill={accent} className="bwlg2"/>
+      {[[18,18,1.2,.52],[280,20,1,.48],[288,128,1.2,.5],[12,132,1,.48],[150,10,.9,.44],[248,72,1,.42],[50,76,1,.42],[150,142,1.1,.44],[88,38,.8,.4],[215,122,.8,.4],[168,58,.9,.38],[120,110,.8,.4],[78,118,.9,.42],[232,42,.8,.4]].map(([x,y,r,op]:number[],i)=>(
+        <circle key={i} cx={x} cy={y} r={r} fill={accent} opacity={op}/>
+      ))}
+      <path d="M14,150 Q7,128 14,112 Q21,96 14,82" stroke={accent} strokeWidth="1.4" opacity=".28" strokeLinecap="round"/>
+      <path d="M28,150 Q35,134 28,120 Q21,108 28,97" stroke={accent} strokeWidth="1" opacity=".2" strokeLinecap="round"/>
+      <path d="M285,150 Q278,132 285,116 Q292,100 285,85" stroke={accent} strokeWidth="1.3" opacity=".25" strokeLinecap="round"/>
+      <g className="bwlj1" transform="translate(148,52)">
+        <ellipse cx="0" cy="0" rx="22" ry="11" fill={accent} opacity=".15"/>
+        <ellipse cx="0" cy="1" rx="14" ry="7" fill={accent} opacity=".1"/>
+        {([-12,-6,0,6,12] as number[]).map((x,i)=>(
+          <path key={i} d={`M${x},10 Q${x+(i%2===0?4:-4)},${20+i%2*4} ${x},${26+i%3*3}`} stroke={accent} strokeWidth=".9" opacity=".22" strokeLinecap="round"/>
+        ))}
+      </g>
+      <g className="bwlj2" transform="translate(242,88)">
+        <ellipse cx="0" cy="0" rx="10" ry="5.5" fill={accent} opacity=".12"/>
+        {([-6,-2,2,6] as number[]).map((x,i)=>(
+          <path key={i} d={`M${x},5 Q${x+(i%2===0?3:-3)},${13+i%2*3} ${x},${18+i%2*2}`} stroke={accent} strokeWidth=".8" opacity=".2" strokeLinecap="round"/>
+        ))}
+      </g>
+      {[[58,102,3],[72,82,2],[188,122,2.5],[202,68,2.8],[118,138,2]].map(([x,y,r]:number[],i)=>(
+        <circle key={`b${i}`} cx={x} cy={y} r={r} stroke={accent} strokeWidth=".7" opacity=".2"/>
+      ))}
+    </svg>
+  );
+  if (themeId==='lavender_field') return (
+    <svg style={{...s,opacity:1}} viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice" fill={accent}>
+      <defs><style>{`
+        @keyframes lf-fly{0%,100%{transform:translate(0,0)rotate(-5deg)}50%{transform:translate(4px,-6px)rotate(5deg)}}
+        .lfbf{animation:lf-fly 3.5s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+      `}</style></defs>
+      <path d="M-10,132 Q150,122 310,132 L310,155 L-10,155Z" opacity=".07"/>
+      {([[20,150],[38,150],[55,150],[72,150],[88,150],[220,150],[238,150],[255,150],[272,150],[288,150]] as number[][]).map(([x,base],i)=>(
+        <g key={i} opacity=".12">
+          <line x1={x} y1={base} x2={x} y2={base-42} stroke={accent} strokeWidth="1.2" fill="none"/>
+          {([-2,-1,0,1,2] as number[]).map((j,k)=>(
+            <ellipse key={k} cx={x+j*2} cy={base-22-k*5} rx="2.2" ry="4.5" transform={`rotate(${j*18} ${x+j*2} ${base-22-k*5})`}/>
+          ))}
+        </g>
+      ))}
+      <g className="lfbf" transform="translate(148,65)">
+        <ellipse cx="-9" cy="-3" rx="13" ry="8" opacity=".15" transform="rotate(-18 -9 -3)"/>
+        <ellipse cx="9" cy="-3" rx="13" ry="8" opacity=".15" transform="rotate(18 9 -3)"/>
+        <ellipse cx="-6" cy="5" rx="7" ry="5" opacity=".12" transform="rotate(20 -6 5)"/>
+        <ellipse cx="6" cy="5" rx="7" ry="5" opacity=".12" transform="rotate(-20 6 5)"/>
+        <line x1="0" y1="-10" x2="0" y2="9" stroke={accent} strokeWidth=".8" fill="none" opacity=".18"/>
+      </g>
+      {[[72,32,35],[202,22,65],[268,58,20],[125,78,50],[242,98,80]].map(([x,y,rot]:number[],i)=>(
+        <ellipse key={`p${i}`} cx={x} cy={y} rx="5" ry="3" transform={`rotate(${rot} ${x} ${y})`} opacity=".1"/>
+      ))}
+      {[[15,15,1.5,.5],[282,15,1.3,.46],[12,135,1.5,.5],[284,130,1.3,.46],[150,8,1.2,.44]].map(([x,y,r,op]:number[],i)=>(
+        <circle key={`d${i}`} cx={x} cy={y} r={r} opacity={op}/>
+      ))}
+    </svg>
+  );
   return null;
 });

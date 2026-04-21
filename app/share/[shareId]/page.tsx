@@ -106,6 +106,8 @@ const NOTE_THEMES: Record<string, { bg: string; accent: string; svg: string; dar
   kucing:    { bg: '#FAF7F4', accent: '#C28B68', svg: 'kucing' },
   notebook:  { bg: '#FFFAEC', accent: '#9B7A38', svg: 'notebook' },
   eid:       { bg: '#F3FBF5', accent: '#2E7D52', svg: 'eid' },
+  bawah_laut:    { bg: '#020C14', accent: '#00E5CC', svg: 'bawah_laut', dark: true },
+  lavender_field:{ bg: '#F4F0FA', accent: '#7C4DCC', svg: 'lavender_field' },
 };
 
 function ThemeSvg({ themeId, accent }: { themeId: string; accent: string }) {
@@ -489,6 +491,146 @@ function ThemeSvg({ themeId, accent }: { themeId: string; accent: string }) {
           <line x1="-5" y1="0" x2="5" y2="0" stroke={accent} strokeWidth=".9"/>
           <line x1="-3.5" y1="-3.5" x2="3.5" y2="3.5" stroke={accent} strokeWidth=".6"/>
           <line x1="3.5" y1="-3.5" x2="-3.5" y2="3.5" stroke={accent} strokeWidth=".6"/>
+        </g>
+      ))}
+    </svg>
+  );
+  if (themeId==='bawah_laut') return (
+    <svg style={{...s,opacity:1}} viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" fill="none">
+      <defs><style>{`
+        @keyframes bwl-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+        @keyframes bwl-bob2{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+        @keyframes bwl-bob3{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+        @keyframes bwl-glow{0%,100%{opacity:.06}50%{opacity:.16}}
+        @keyframes bwl-glow2{0%,100%{opacity:.04}50%{opacity:.11}}
+        @keyframes bwl-tw{0%,100%{opacity:.35}50%{opacity:.78}}
+        @keyframes bwl-rise{0%{transform:translateY(0);opacity:.5}100%{transform:translateY(-230px);opacity:0}}
+        .bwlj1{animation:bwl-bob 5s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+        .bwlj2{animation:bwl-bob2 6.5s ease-in-out infinite 1.5s;transform-box:fill-box;transform-origin:center}
+        .bwlj3{animation:bwl-bob3 4.5s ease-in-out infinite .8s;transform-box:fill-box;transform-origin:center}
+        .bwlj4{animation:bwl-bob 7s ease-in-out infinite 2.5s;transform-box:fill-box;transform-origin:center}
+        .bwlg1{animation:bwl-glow 4s ease-in-out infinite}.bwlg2{animation:bwl-glow2 5s ease-in-out infinite 1.5s}.bwlg3{animation:bwl-glow 3.5s ease-in-out infinite .8s}
+        .bwlt1{animation:bwl-tw 2.8s ease-in-out infinite}.bwlt2{animation:bwl-tw 3.5s ease-in-out infinite .7s}.bwlt3{animation:bwl-tw 2.2s ease-in-out infinite 1.2s}.bwlt4{animation:bwl-tw 4.1s ease-in-out infinite .4s}.bwlt5{animation:bwl-tw 3.0s ease-in-out infinite 1.9s}.bwlt6{animation:bwl-tw 2.6s ease-in-out infinite .9s}.bwlt7{animation:bwl-tw 3.8s ease-in-out infinite .2s}.bwlt8{animation:bwl-tw 2.4s ease-in-out infinite 1.5s}.bwlt9{animation:bwl-tw 3.2s ease-in-out infinite .6s}.bwlt10{animation:bwl-tw 2.0s ease-in-out infinite 1.8s}.bwlt11{animation:bwl-tw 2.9s ease-in-out infinite .3s}.bwlt12{animation:bwl-tw 3.6s ease-in-out infinite 1.0s}.bwlt13{animation:bwl-tw 2.7s ease-in-out infinite 1.4s}.bwlt14{animation:bwl-tw 4.0s ease-in-out infinite .5s}.bwlt15{animation:bwl-tw 2.5s ease-in-out infinite 2.2s}
+        .bwlrise1{animation:bwl-rise 8s ease-in infinite}.bwlrise2{animation:bwl-rise 12s ease-in 3s infinite}.bwlrise3{animation:bwl-rise 10s ease-in 6s infinite}
+      `}</style></defs>
+      <circle cx="80" cy="220" r="90" fill={accent} className="bwlg1"/>
+      <circle cx="340" cy="480" r="75" fill={accent} className="bwlg2"/>
+      <circle cx="160" cy="680" r="80" fill={accent} className="bwlg3"/>
+      {([[32,48,1.2,'bwlt1'],[88,28,1,'bwlt2'],[152,55,1.4,'bwlt3'],[205,35,1,'bwlt4'],[268,52,1.5,'bwlt5'],[338,25,1,'bwlt6'],[58,92,1,'bwlt7'],[128,78,1.2,'bwlt8'],[188,105,1,'bwlt9'],[242,88,1.3,'bwlt10'],[302,72,1,'bwlt11'],[28,145,1,'bwlt12'],[378,112,1.1,'bwlt13'],[248,148,1,'bwlt14'],[112,162,1.2,'bwlt15'],[42,312,1,'bwlt1'],[188,348,1.2,'bwlt3'],[325,328,1,'bwlt5'],[92,448,1.1,'bwlt7'],[252,418,1,'bwlt2'],[372,475,1,'bwlt4'],[132,518,1,'bwlt6'],[285,558,1.2,'bwlt8'],[58,582,1,'bwlt9'],[388,612,1,'bwlt3'],[168,638,1.1,'bwlt1'],[308,668,1,'bwlt5'],[82,698,1.2,'bwlt7'],[222,725,1,'bwlt2'],[352,755,1.1,'bwlt4']] as [number,number,number,string][]).map(([cx,cy,r,cls],i)=>(
+        <circle key={i} className={cls} cx={cx} cy={cy} r={r} fill={accent}/>
+      ))}
+      <circle className="bwlrise1" cx="95" cy="780" r="4" stroke={accent} strokeWidth=".8" opacity=".3"/>
+      <circle className="bwlrise2" cx="210" cy="780" r="3" stroke={accent} strokeWidth=".7" opacity=".3"/>
+      <circle className="bwlrise3" cx="320" cy="780" r="5" stroke={accent} strokeWidth=".8" opacity=".28"/>
+      <path d="M22,800 Q10,760 22,720 Q34,680 22,640 Q10,600 22,560 Q34,520 22,480 Q10,440 22,400" stroke={accent} strokeWidth="2" opacity=".22" strokeLinecap="round"/>
+      <path d="M45,800 Q58,770 45,740 Q32,712 45,685 Q58,658 45,630" stroke={accent} strokeWidth="1.4" opacity=".15" strokeLinecap="round"/>
+      <path d="M378,800 Q390,758 378,715 Q366,672 378,630 Q390,588 378,548 Q366,508 378,468" stroke={accent} strokeWidth="2" opacity=".2" strokeLinecap="round"/>
+      <path d="M358,800 Q345,772 358,745 Q370,718 358,692 Q345,665 358,638" stroke={accent} strokeWidth="1.4" opacity=".14" strokeLinecap="round"/>
+      <path d="M205,800 Q218,775 205,752 Q192,728 205,705 Q218,682 205,660" stroke={accent} strokeWidth="1.5" opacity=".18" strokeLinecap="round"/>
+      <g className="bwlj1" transform="translate(200,180)">
+        <ellipse cx="0" cy="0" rx="55" ry="28" fill={accent} opacity=".12"/>
+        <ellipse cx="0" cy="2" rx="38" ry="18" fill={accent} opacity=".08"/>
+        <ellipse cx="0" cy="5" rx="22" ry="12" fill={accent} opacity=".06"/>
+        {([-32,-20,-10,0,10,20,32] as number[]).map((x,i)=>(
+          <path key={i} d={`M${x},26 Q${x+(i%2===0?6:-6)},${46+i*4} ${x},${64+i%3*8}`} stroke={accent} strokeWidth="1.2" opacity=".18" strokeLinecap="round"/>
+        ))}
+      </g>
+      <g className="bwlj2" transform="translate(82,440)">
+        <ellipse cx="0" cy="0" rx="38" ry="20" fill={accent} opacity=".10"/>
+        <ellipse cx="0" cy="2" rx="24" ry="12" fill={accent} opacity=".07"/>
+        {([-22,-12,-2,8,18,28] as number[]).map((x,i)=>(
+          <path key={i} d={`M${x},18 Q${x+(i%2===0?4:-4)},${32+i*3} ${x},${46+i%2*6}`} stroke={accent} strokeWidth="1" opacity=".16" strokeLinecap="round"/>
+        ))}
+      </g>
+      <g className="bwlj3" transform="translate(338,320)">
+        <ellipse cx="0" cy="0" rx="25" ry="13" fill={accent} opacity=".09"/>
+        <ellipse cx="0" cy="1" rx="16" ry="8" fill={accent} opacity=".06"/>
+        {([-14,-7,0,7,14] as number[]).map((x,i)=>(
+          <path key={i} d={`M${x},12 Q${x+(i%2===0?3:-3)},${22+i*2} ${x},${30+i%2*5}`} stroke={accent} strokeWidth=".9" opacity=".15" strokeLinecap="round"/>
+        ))}
+      </g>
+      <g className="bwlj4" transform="translate(152,580)">
+        <ellipse cx="0" cy="0" rx="18" ry="9" fill={accent} opacity=".08"/>
+        {([-10,-4,4,10] as number[]).map((x,i)=>(
+          <path key={i} d={`M${x},8 Q${x+(i%2===0?2:-2)},${16+i*2} ${x},${22+i%2*4}`} stroke={accent} strokeWidth=".8" opacity=".14" strokeLinecap="round"/>
+        ))}
+      </g>
+      {[[72,350,5],[145,420,4],[268,388,6],[312,510,4],[88,622,5],[245,658,4],[368,720,5]].map(([x,y,r]:number[],i)=>(
+        <circle key={`bb${i}`} cx={x} cy={y} r={r} stroke={accent} strokeWidth=".8" opacity=".18"/>
+      ))}
+      <path d="M-10,775 Q40,755 90,765 Q135,750 180,762 Q225,748 275,758 Q322,745 370,755 Q390,760 415,752 L415,800 L-10,800Z" fill={accent} opacity=".08"/>
+      <path d="M80,0 L50,250" stroke={accent} strokeWidth="18" opacity=".03" strokeLinecap="round"/>
+      <path d="M200,0 L180,300" stroke={accent} strokeWidth="14" opacity=".03" strokeLinecap="round"/>
+      <path d="M320,0 L350,220" stroke={accent} strokeWidth="16" opacity=".03" strokeLinecap="round"/>
+    </svg>
+  );
+  if (themeId==='lavender_field') return (
+    <svg style={{...s,opacity:1}} viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" fill={accent}>
+      <defs><style>{`
+        @keyframes lf-fly{0%,100%{transform:translate(0,0)rotate(-8deg)}50%{transform:translate(8px,-14px)rotate(8deg)}}
+        @keyframes lf-fly2{0%,100%{transform:translate(0,0)rotate(5deg)}50%{transform:translate(-6px,-10px)rotate(-5deg)}}
+        @keyframes lf-sway{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
+        @keyframes lf-drift{0%,100%{transform:translate(0,0)rotate(0deg);opacity:.12}50%{transform:translate(5px,-8px)rotate(15deg);opacity:.18}}
+        .lfbf1{animation:lf-fly 5s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+        .lfbf2{animation:lf-fly2 6.5s ease-in-out infinite 1.5s;transform-box:fill-box;transform-origin:center}
+        .lfbf3{animation:lf-fly 4.5s ease-in-out infinite 2.8s;transform-box:fill-box;transform-origin:center}
+        .lfsway{animation:lf-sway 4s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+        .lfdrift{animation:lf-drift 6s ease-in-out infinite}
+      `}</style></defs>
+      <path d="M-10,618 Q100,595 200,610 Q300,624 415,604 L415,800 L-10,800Z" opacity=".06"/>
+      <path d="M-10,658 Q100,638 200,652 Q300,668 415,648 L415,800 L-10,800Z" opacity=".07"/>
+      {([[22,800],[42,800],[62,800],[82,800],[102,800],[122,800],[142,800],[162,800],[182,800],[202,800],[222,800],[242,800],[262,800],[282,800],[302,800],[322,800],[342,800],[362,800],[382,800]] as number[][]).map(([x,base],i)=>{
+        const h=55+((i*7)%25);const bot=base-h;
+        return (
+          <g key={i} opacity=".12" className="lfsway">
+            <line x1={x} y1={base} x2={x} y2={bot} stroke={accent} strokeWidth="1.3" fill="none"/>
+            {([-2,-1,0,1,2] as number[]).map((j,k)=>(
+              <ellipse key={k} cx={x+j*2.5} cy={bot+10+k*5} rx="2.5" ry="5" transform={`rotate(${j*20} ${x+j*2.5} ${bot+10+k*5})`}/>
+            ))}
+          </g>
+        );
+      })}
+      {([[32,760],[52,760],[72,760],[92,760],[112,760],[132,760],[152,760],[172,760],[192,760],[212,760],[232,760],[252,760],[272,760],[292,760],[312,760],[332,760],[352,760],[372,760]] as number[][]).map(([x,base],i)=>{
+        const h=45+((i*5)%20);const bot=base-h;
+        return (
+          <g key={i} opacity=".08">
+            <line x1={x} y1={base} x2={x} y2={bot} stroke={accent} strokeWidth="1" fill="none"/>
+            {([-1,0,1] as number[]).map((j,k)=>(
+              <ellipse key={k} cx={x+j*2} cy={bot+8+k*5} rx="2" ry="4" transform={`rotate(${j*15} ${x+j*2} ${bot+8+k*5})`}/>
+            ))}
+          </g>
+        );
+      })}
+      <g className="lfbf1" transform="translate(188,260)">
+        <ellipse cx="-14" cy="-4" rx="20" ry="13" opacity=".14" transform="rotate(-22 -14 -4)"/>
+        <ellipse cx="14" cy="-4" rx="20" ry="13" opacity=".14" transform="rotate(22 14 -4)"/>
+        <ellipse cx="-9" cy="8" rx="11" ry="7.5" opacity=".11" transform="rotate(28 -9 8)"/>
+        <ellipse cx="9" cy="8" rx="11" ry="7.5" opacity=".11" transform="rotate(-28 9 8)"/>
+        <line x1="0" y1="-15" x2="0" y2="12" stroke={accent} strokeWidth="1" fill="none" opacity=".2"/>
+      </g>
+      <g className="lfbf2" transform="translate(318,380)">
+        <ellipse cx="-10" cy="-3" rx="14" ry="9" opacity=".12" transform="rotate(-18 -10 -3)"/>
+        <ellipse cx="10" cy="-3" rx="14" ry="9" opacity=".12" transform="rotate(18 10 -3)"/>
+        <ellipse cx="-7" cy="6" rx="8" ry="5.5" opacity=".1" transform="rotate(22 -7 6)"/>
+        <ellipse cx="7" cy="6" rx="8" ry="5.5" opacity=".1" transform="rotate(-22 7 6)"/>
+        <line x1="0" y1="-10" x2="0" y2="9" stroke={accent} strokeWidth=".9" fill="none" opacity=".18"/>
+      </g>
+      <g className="lfbf3" transform="translate(72,480)">
+        <ellipse cx="-12" cy="-3" rx="17" ry="11" opacity=".12" transform="rotate(-20 -12 -3)"/>
+        <ellipse cx="12" cy="-3" rx="17" ry="11" opacity=".12" transform="rotate(20 12 -3)"/>
+        <ellipse cx="-8" cy="7" rx="9" ry="6" opacity=".1" transform="rotate(25 -8 7)"/>
+        <ellipse cx="8" cy="7" rx="9" ry="6" opacity=".1" transform="rotate(-25 8 7)"/>
+        <line x1="0" y1="-12" x2="0" y2="10" stroke={accent} strokeWidth="1" fill="none" opacity=".18"/>
+      </g>
+      {[[65,128,30],[155,195,65],[278,142,15],[348,245,80],[112,318,45],[302,355,10],[188,418,70],[58,522,35],[352,508,55],[142,598,20]].map(([x,y,rot]:number[],i)=>(
+        <ellipse key={`p${i}`} cx={x} cy={y} rx="5" ry="3" transform={`rotate(${rot} ${x} ${y})`} className="lfdrift" opacity=".12"/>
+      ))}
+      {[[28,48,1.5,.5],[372,62,1.3,.46],[18,185,1.5,.5],[385,205,1.3,.46],[198,105,1.2,.44],[52,358,1,.4],[348,402,1.2,.42],[108,505,1,.4],[292,542,1.1,.42],[158,645,1,.38]].map(([x,y,r,op]:number[],i)=>(
+        <circle key={`d${i}`} cx={x} cy={y} r={r} opacity={op}/>
+      ))}
+      {[[60,88,1],[210,58,1.1],[340,95,.9]].map(([cx,cy,sc]:number[],i)=>(
+        <g key={`c${i}`} transform={`translate(${cx},${cy})scale(${sc})`} opacity=".06">
+          <circle cx="0" cy="0" r="18"/><circle cx="18" cy="-5" r="14"/><circle cx="-18" cy="-5" r="12"/><circle cx="8" cy="-14" r="10"/>
         </g>
       ))}
     </svg>

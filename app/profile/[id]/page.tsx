@@ -49,7 +49,9 @@ const NOTE_THEMES: Record<string, { label: string; emoji: string; bg: string; ac
   kota_malam:{ label: 'Kota Malam', emoji: '🌃', bg: '#0A0E14', accent: '#F0D090', dark: true },
   kucing:    { label: 'Kucing', emoji: '🐱', bg: '#FAF7F4', accent: '#C28B68' },
   notebook:  { label: 'Notebook', emoji: '📓', bg: '#FFFAEC', accent: '#9B7A38' },
-  eid:       { label: 'Eid', emoji: '🌙', bg: '#F3FBF5', accent: '#2E7D52' },
+  eid:           { label: 'Eid', emoji: '🌙', bg: '#F3FBF5', accent: '#2E7D52' },
+  bawah_laut:    { label: 'Bawah Laut', emoji: '🐠', bg: '#020C14', accent: '#00E5CC', dark: true },
+  lavender_field:{ label: 'Padang Lavender', emoji: '🌷', bg: '#F4F0FA', accent: '#7C4DCC' },
 };
 
 const NOTE_COLORS: Record<string, { bg: string; border: string }> = {
