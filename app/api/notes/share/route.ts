@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { invalidate, CK } from "@/lib/redis";
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -25,5 +26,16 @@ export async function POST(req: Request) {
       isOneTime: enable ? (!!isOneTime) : false
     } as any 
   });
+  const keys = [
+    CK.userNotes(session.user.id),
+    CK.note(id),
+    CK.sharedNote(id),
+    (note as any).shareId ? CK.sharedNote((note as any).shareId) : "",
+    shareId ? CK.sharedNote(shareId) : "",
+    CK.sharedUserNotes(session.user.id),
+    CK.userPage(session.user.id),
+    CK.userPublicNotes(session.user.id),
+  ].filter(Boolean);
+  await invalidate(...keys);
   return NextResponse.json({ shareId });
 }

@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { encrypt, decrypt } from "@/lib/encryption";
 import { validateCsrfToken } from "@/lib/csrf";
+import { invalidate, CK } from "@/lib/redis";
 
 function checkCsrf(req: Request, userId: string): boolean {
   const token = req.headers.get("X-CSRF-Token");
@@ -57,6 +58,8 @@ export async function POST(req: Request) {
       shareId: null,
     },
   });
+
+  await invalidate(CK.userNotes(session.user.id));
 
   return NextResponse.json({
     ...duplicate,

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { cached, CK } from "@/lib/redis";
 
 export async function GET(req: Request) {
   const session = await auth();
@@ -18,25 +19,27 @@ export async function GET(req: Request) {
   });
   const isAdmin = viewer?.role === "admin";
 
-  const users = await (prisma.user.findMany as any)({
-    where: {
-      id: { not: session.user.id },
-      ...(isAdmin ? {} : { isSuspended: false }),
-      OR: [
-        { name: { contains: q, mode: "insensitive" } },
-        { username: { contains: q, mode: "insensitive" } },
-      ],
-    },
-    select: {
-      id: true,
-      name: true,
-      username: true,
-      image: true,
-      isSuspended: true,
-      _count: { select: { notes: { where: { shareId: { not: null } } } } },
-    },
-    take: 15,
-  });
+  const users = await cached(CK.usersSearch(q, isAdmin), async () => {
+    return await (prisma.user.findMany as any)({
+      where: {
+        id: { not: session.user!.id },
+        ...(isAdmin ? {} : { isSuspended: false }),
+        OR: [
+          { name: { contains: q, mode: "insensitive" } },
+          { username: { contains: q, mode: "insensitive" } },
+        ],
+      },
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        image: true,
+        isSuspended: true,
+        _count: { select: { notes: { where: { shareId: { not: null } } } } },
+      },
+      take: 15,
+    });
+  }, 30);
 
   return NextResponse.json(
     users.map((u: any) => ({

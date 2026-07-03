@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { encrypt } from "@/lib/encryption";
 import { validateCsrfToken } from "@/lib/csrf";
+import { invalidate, CK } from "@/lib/redis";
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -50,6 +51,8 @@ export async function POST(req: Request) {
     const result = await prisma.note.createMany({
       data: dataToCreate
     });
+
+    await invalidate(CK.userNotes(userId), CK.sharedUserNotes(userId), CK.userPage(userId), CK.userPublicNotes(userId));
 
     return NextResponse.json({ 
       success: true, 

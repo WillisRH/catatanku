@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { invalidate, CK } from "@/lib/redis";
 
 // POST — set an initial password for Google-only accounts (no existing password)
 export async function POST(req: Request) {
@@ -23,5 +24,6 @@ export async function POST(req: Request) {
   const hashed = await bcrypt.hash(password, 12);
   await prisma.user.update({ where: { id: session.user.id }, data: { password: hashed } });
 
+  await invalidate(CK.userProfile(session.user.id));
   return NextResponse.json({ success: true });
 }

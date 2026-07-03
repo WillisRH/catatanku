@@ -14,10 +14,15 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-messaging.onBackgroundMessage(({ notification }) => {
-  if (!notification) return;
-  self.registration.showNotification(notification.title ?? "Catatanku", {
-    body: notification.body ?? "",
-    icon: "/icon-192.png",
-  });
+messaging.onBackgroundMessage((payload) => {
+  const title = (payload.notification && payload.notification.title) || (payload.data && payload.data.title) || "Catatanku";
+  const body = (payload.notification && payload.notification.body) || (payload.data && payload.data.body) || "";
+  
+  // Only show if there's no notification payload (browser auto-shows those)
+  if (!payload.notification) {
+    self.registration.showNotification(title, {
+      body: body,
+      icon: "/icon.svg",
+    });
+  }
 });

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { invalidate, CK } from "@/lib/redis";
 
 const ALLOWED = ["👍", "❤️", "🔥", "✨", "🎉"];
 const pr = (prisma as any).profileReaction;
@@ -32,11 +33,13 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     } else {
       // Different emoji → replace
       await pr.update({ where: { id: existing.id }, data: { emoji } });
+      await invalidate(CK.userPage(toUserId));
       return NextResponse.json({ action: "changed", emoji, previous: existing.emoji });
     }
   }
 
   // No existing → add
   await pr.create({ data: { fromUserId: session.user.id, toUserId, emoji } });
+  await invalidate(CK.userPage(toUserId));
   return NextResponse.json({ action: "added", emoji });
 }

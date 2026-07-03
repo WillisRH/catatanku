@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { decrypt } from "@/lib/encryption";
+import { invalidate, CK } from "@/lib/redis";
 
 // List of emails allowed to have the admin medal
 const ADMIN_EMAILS = ["willissmpn51jkrt@gmail.com"]; // User should update this with their real email
@@ -123,6 +124,8 @@ export async function POST(req: Request) {
       data: { role: "admin" },
     });
   }
+
+  await invalidate(CK.userProfile(userId), CK.publicProfile(userId), CK.userPage(userId));
 
   return NextResponse.json({ success: true });
 }

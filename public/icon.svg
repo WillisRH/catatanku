@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="96" fill="#282C34"/>
+  <rect x="140" y="96" width="232" height="320" rx="16" fill="#3E4451"/>
+  <rect x="156" y="80" width="200" height="320" rx="16" fill="#4B5263"/>
+  <rect x="172" y="64" width="168" height="320" rx="16" fill="#21252B"/>
+  <!-- Spine binding -->
+  <rect x="172" y="64" width="18" height="320" rx="4" fill="#61AFEF" opacity="0.8"/>
+  <!-- Lines on page -->
+  <rect x="204" y="130" width="108" height="8" rx="4" fill="#61AFEF" opacity="0.9"/>
+  <rect x="204" y="158" width="92" height="6" rx="3" fill="#ABB2BF" opacity="0.6"/>
+  <rect x="204" y="180" width="100" height="6" rx="3" fill="#ABB2BF" opacity="0.6"/>
+  <rect x="204" y="202" width="84" height="6" rx="3" fill="#ABB2BF" opacity="0.6"/>
+  <rect x="204" y="224" width="96" height="6" rx="3" fill="#ABB2BF" opacity="0.6"/>
+  <!-- Heart accent -->
+  <path d="M236 276 C236 268 244 260 252 268 C260 260 268 268 268 276 C268 284 252 296 252 296 C252 296 236 284 236 276Z" fill="#E06C75" opacity="0.9"/>
+</svg>

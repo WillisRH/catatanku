@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdminWithCsrf } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
+import { invalidate, invalidatePrefix, CK } from "@/lib/redis";
 
 export async function POST(req: Request) {
   const admin = await requireAdminWithCsrf(req);
@@ -35,6 +36,9 @@ export async function POST(req: Request) {
       suspendNote: suspend ? (note || null) : null,
     },
   });
+
+  await invalidate(CK.userProfile(userId), CK.publicProfile(userId), CK.userPage(userId));
+  await invalidatePrefix("users:search:");
 
   return NextResponse.json({ ok: true });
 }

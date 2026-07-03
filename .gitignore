@@ -17,6 +17,10 @@
 /.next/
 /out/
 
+# PWA generated files (Workbox artifacts — not needed since we use a manual SW)
+/public/workbox-*.js
+/public/workbox-*.js.map
+
 # production
 /build
 
@@ -43,3 +47,17 @@ next-env.d.ts
 /app/generated/prisma
 
 .vercel
+.env*.local
+
+# scratch and test scripts
+/cleanDuplicates.js
+/scratch_db.js
+/testParse.js
+/testParseBlocks.js
+/testParseClean.js
+/test_md.js
+/test_md2.js
+
+# IDE client metadata
+.claude/
+

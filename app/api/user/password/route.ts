@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { invalidate, CK } from "@/lib/redis";
 
 export async function PATCH(req: Request) {
   const session = await auth();
@@ -22,5 +23,6 @@ export async function PATCH(req: Request) {
   const hashed = await bcrypt.hash(newPassword, 12);
   await prisma.user.update({ where: { id: session.user.id }, data: { password: hashed } });
 
+  await invalidate(CK.userProfile(session.user.id));
   return NextResponse.json({ success: true });
 }

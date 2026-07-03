@@ -103,6 +103,11 @@ const THEMES: Record<string, { bg: string; accent: string; soft: string; ink: st
   golden:   { bg:"#FAF7F0", accent:"#B5902A", soft:"#EAD898", ink:"#2A2010", ink2:"#807050", ink3:"#B8A870", surface:"#FFFFFF", line:"#EDE4C0", hero1:"#DFC070", hero2:"#B5902A" },
   slate:    { bg:"#F4F5F6", accent:"#607080", soft:"#C8D4DC", ink:"#1A2228", ink2:"#607080", ink3:"#9AAAB8", surface:"#FFFFFF", line:"#D8E0E8", hero1:"#A8B8C8", hero2:"#607080" },
   midnight: { bg:"#1A1820", accent:"#9A8FE0", soft:"#2A2840", ink:"#E8E6F8", ink2:"#A098C8", ink3:"#6860A0", surface:"#26243A", line:"#36344E", hero1:"#3A3660", hero2:"#9A8FE0" },
+  peach:    { bg:"#FFF7F3", accent:"#E8541A", soft:"#FAD5C0", ink:"#2D1208", ink2:"#8A4A34", ink3:"#C49078", surface:"#FFFFFF", line:"#F5CEBC", hero1:"#E8C9A8", hero2:"#E8541A" },
+  matcha:   { bg:"#F4F7F4", accent:"#4C7C54", soft:"#C7DFC9", ink:"#1A2E1E", ink2:"#4C7C54", ink3:"#98B8A0", surface:"#FFFFFF", line:"#DCEAE0", hero1:"#9ECFAD", hero2:"#4C7C54" },
+  sunset:   { bg:"#FFF5ED", accent:"#E07A5F", soft:"#F4D1C6", ink:"#3D1A10", ink2:"#8A5A4A", ink3:"#C8A090", surface:"#FFFFFF", line:"#F6E4DA", hero1:"#ECAAA0", hero2:"#E07A5F" },
+  cyberpunk:{ bg:"#0D0E15", accent:"#FF007F", soft:"rgba(255,0,127,0.15)", ink:"#00FFFF", ink2:"#FF007F", ink3:"#A000A8", surface:"#151622", line:"#2A2C3F", hero1:"#8A00FF", hero2:"#FF007F" },
+  glass:    { bg:"#0E1525", accent:"#8B5CF6", soft:"rgba(139, 92, 246, 0.15)", ink:"#F3F4F6", ink2:"#9CA3AF", ink3:"#4B5563", surface:"rgba(255, 255, 255, 0.035)", line:"rgba(255, 255, 255, 0.08)", hero1:"#4F46E5", hero2:"#8B5CF6" },
 };
 
 const MEDALS = [
@@ -313,11 +318,37 @@ export default function ProfilePage() {
   `;
 
   if (loading) return (
-    <div style={{ minHeight:"100vh", background:"#FAF6F0", display:"flex", alignItems:"center", justifyContent:"center" }}>
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-      <div style={{ textAlign:"center" }}>
-        <div style={{ width:36, height:36, borderRadius:"50%", border:"3px solid #EBDACB", borderTopColor:"#C4956A", animation:"spin 0.8s linear infinite", margin:"0 auto 12px" }}/>
-        <p style={{ fontFamily:"'Lora',serif", fontSize:".84rem", color:"#BEB3A8" }}>Memuat profil...</p>
+    <div style={{ minHeight:"100vh", background:"#FAF6F0" }}>
+      <style>{`
+        @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+        .sk{background:linear-gradient(90deg,#EBDACB 25%,#F5EDE4 50%,#EBDACB 75%);background-size:200% 100%;animation:shimmer 1.5s ease-in-out infinite;border-radius:8px}
+      `}</style>
+      {/* Skeleton hero */}
+      <div style={{ height:180, background:"linear-gradient(135deg, #E8C9A8 0%, #C4956A 100%)" }}/>
+      <div style={{ padding:"0 20px", maxWidth:1100, margin:"0 auto" }}>
+        {/* Avatar skeleton */}
+        <div style={{ marginTop:-45, marginBottom:20 }}>
+          <div className="sk" style={{ width:90, height:90, borderRadius:"50%", border:"4px solid #FAF6F0" }}/>
+          <div className="sk" style={{ width:180, height:24, marginTop:14 }}/>
+          <div className="sk" style={{ width:100, height:14, marginTop:10 }}/>
+        </div>
+        {/* Stats grid skeleton */}
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:16 }}>
+          {[0,1,2,3].map(i => (
+            <div key={i} style={{ borderRadius:20, background:"#FFFFFF", border:"1px solid #EDE7DF", padding:24 }}>
+              <div className="sk" style={{ width:32, height:32, borderRadius:9, marginBottom:12 }}/>
+              <div className="sk" style={{ width:50, height:28, marginBottom:6 }}/>
+              <div className="sk" style={{ width:70, height:10 }}/>
+            </div>
+          ))}
+        </div>
+        {/* Card skeleton */}
+        <div style={{ borderRadius:20, background:"#FFFFFF", border:"1px solid #EDE7DF", padding:24 }}>
+          <div className="sk" style={{ width:120, height:12, marginBottom:16 }}/>
+          <div style={{ display:"flex", gap:8 }}>
+            {[0,1,2,3,4].map(i => <div key={i} className="sk" style={{ width:60, height:40, borderRadius:50 }}/>)}
+          </div>
+        </div>
       </div>
     </div>
   );

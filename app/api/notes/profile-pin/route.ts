@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { validateCsrfToken } from "@/lib/csrf";
+import { invalidate, CK } from "@/lib/redis";
 
 export async function PATCH(req: Request) {
   const session = await auth();
@@ -24,5 +25,14 @@ export async function PATCH(req: Request) {
     data: { isProfilePinned: pin },
   });
 
+  const keys = [
+    CK.userNotes(session.user.id),
+    CK.note(noteId),
+    CK.userPage(session.user.id),
+    CK.sharedNote(noteId),
+    CK.sharedUserNotes(session.user.id),
+    CK.userPublicNotes(session.user.id),
+  ];
+  await invalidate(...keys);
   return NextResponse.json({ success: true });
 }

@@ -25,8 +25,8 @@ model User {
   fcmTokens      FcmToken[]
   accounts       Account[]
   sessions       Session[]
-  medals         String[]   @default([])
-  bio            String?
+  medals            String[]           @default([])
+  bio               String?
   instagram      String?
   twitter        String?
   tiktok         String?
@@ -34,10 +34,11 @@ model User {
   companionName  String?
   displayedMedal String?
   isPrivate      Boolean    @default(false)
-  role           String     @default("user")
-  isSuspended    Boolean    @default(false)
-  suspendReason  String?
-  suspendNote    String?
+  role              String             @default("user")
+  isSuspended       Boolean            @default(false)
+  suspendReason     String?
+  suspendNote       String?
+  collabMemberships NoteCollabMember[]
 }
 
 model Note {
@@ -71,7 +72,10 @@ model Note {
   isModerated     Boolean  @default(false)
   lat             Float?
   lng             Float?
+  collabInvite    String?  @unique
+  collabPaused    Boolean  @default(false)
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  collabMembers   NoteCollabMember[]
 
   @@index([userId])
   @@index([userId, ts(sort: Desc)])
@@ -125,6 +129,34 @@ model Session {
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
+}
+
+model NoteYjsUpdate {
+  noteId    String
+  userId    String
+  data      Bytes
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@id([noteId, userId])
+  @@index([noteId])
+}
+
+model NoteCollabMember {
+  id         String   @id @default(cuid())
+  noteId     String
+  userId     String
+  role       String   @default("editor")
+  lastSeen   DateTime @default(now())
+  joinedAt   DateTime @default(now())
+  cursorData String?
+  isBanned   Boolean  @default(false)
+
+  note     Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([noteId, userId])
+  @@index([noteId])
   @@index([userId])
 }
 

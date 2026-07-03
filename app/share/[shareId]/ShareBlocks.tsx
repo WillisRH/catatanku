@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
+import katex from "katex";
 
 type SBlock =
   | { type: "text"; content: string }
@@ -8,7 +9,8 @@ type SBlock =
   | { type: "image"; url: string; size?: string; align?: string }
   | { type: "gallery"; cols: number; urls: string[] }
   | { type: "link"; url: string; title?: string; description?: string; image?: string; favicon?: string }
-  | { type: "table"; rows: string[][] };
+  | { type: "table"; rows: string[][] }
+  | { type: "math"; content: string };
 
 const szW: Record<string, string> = { sm: "40%", md: "65%", lg: "85%", full: "100%" };
 
@@ -18,12 +20,21 @@ function parseLineStyle(line: string): { align: "left" | "center" | "right"; tex
   return { align: "left", text: line };
 }
 
+function renderKatex(math: string, displayMode: boolean): React.ReactNode {
+  try {
+    const html = katex.renderToString(math, { displayMode, throwOnError: true });
+    return <span dangerouslySetInnerHTML={{ __html: html }} />;
+  } catch (e) {
+    return <span>{displayMode ? `$$${math}$$` : `$${math}$`}</span>;
+  }
+}
+
 function renderInline(raw: string, titleMap: Record<string, string> = {}): React.ReactNode {
   const hasMarkup = raw.includes('**') || raw.includes('_') || raw.includes('<u>') ||
-    raw.includes('~~') || raw.includes('`') || raw.includes('[') || raw.includes('[[');
+    raw.includes('~~') || raw.includes('`') || raw.includes('[') || raw.includes('[[') || raw.includes('$');
   if (!hasMarkup) return raw;
   const parts: React.ReactNode[] = [];
-  const re = /\[\[(.+?)\]\]|\*\*\*(.+?)\*\*\*|\*\*(.+?)\*\*|~~(.+?)~~|`([^`]+)`|\[([^\]]+)\]\((https?:\/\/[^\)]+)\)|_(.+?)_|<u>(.+?)<\/u>/g;
+  const re = /\[\[(.+?)\]\]|\*\*\*(.+?)\*\*\*|\*\*(.+?)\*\*|~~(.+?)~~|`([^`]+)`|\[([^\]]+)\]\((https?:\/\/[^\)]+)\)|_(.+?)_|<u>(.+?)<\/u>|\$([^\s$](?:[^$]*[^\s$])?)\$/g;
   let last = 0; let m: RegExpExecArray | null;
   while ((m = re.exec(raw)) !== null) {
     if (m.index > last) parts.push(raw.slice(last, m.index));
@@ -38,13 +49,114 @@ function renderInline(raw: string, titleMap: Record<string, string> = {}): React
     else if (m[5] !== undefined) parts.push(<code key={m.index} style={{background:'var(--surface2,rgba(0,0,0,0.06))',borderRadius:4,padding:'1px 5px',fontFamily:'monospace',fontSize:'0.88em'}}>{m[5]}</code>);
     else if (m[6] !== undefined) parts.push(<a key={m.index} href={m[7]} target="_blank" rel="noopener noreferrer" style={{color:'var(--accent)',textDecoration:'underline'}}>{m[6]}</a>);
     else if (m[8] !== undefined) parts.push(<em key={m.index} style={{fontStyle:'italic'}}>{m[8]}</em>);
-    else parts.push(<u key={m.index}>{m[9]}</u>);
+    else if (m[9] !== undefined) parts.push(<u key={m.index}>{m[9]}</u>);
+    else if (m[10] !== undefined) parts.push(<React.Fragment key={m.index}>{renderKatex(m[10], false)}</React.Fragment>);
     last = m.index + m[0].length;
   }
   if (last < raw.length) parts.push(raw.slice(last));
   if (parts.length === 0) return '';
   if (parts.length === 1) return parts[0];
   return <>{parts}</>;
+}
+
+function renderLatexInText(text: string): string {
+  let processed = text;
+  
+  // 1. Block math: $$ ... $$
+  processed = processed.replace(/\$\$([\s\S]+?)\$\$/g, (match, formula) => {
+    try {
+      const clean = formula
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'");
+      return katex.renderToString(clean, { displayMode: true, throwOnError: true });
+    } catch (e) {
+      return match;
+    }
+  });
+
+  // 2. Inline math: $ ... $
+  processed = processed.replace(/\$([^\s$](?:[^$]*[^\s$])?)\$/g, (match, formula) => {
+    try {
+      const clean = formula
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'");
+      return katex.renderToString(clean, { displayMode: false, throwOnError: true });
+    } catch (e) {
+      return match;
+    }
+  });
+
+  return processed;
+}
+
+function formatLatexInHtml(html: string): string {
+  if (typeof document === 'undefined') return html;
+  
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  
+  const savedElements: Element[] = [];
+  const codeNodes = div.querySelectorAll('pre, code');
+  codeNodes.forEach((node, index) => {
+    const placeholder = document.createElement('span');
+    placeholder.setAttribute('data-katex-placeholder', index.toString());
+    node.parentNode?.replaceChild(placeholder, node);
+    savedElements[index] = node;
+  });
+  
+  let processedHtml = div.innerHTML;
+  
+  processedHtml = processedHtml.replace(/\$\$([\s\S]+?)\$\$/g, (match, formula) => {
+    try {
+      const clean = formula
+        .replace(/<[^>]*>/g, '')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'");
+      return katex.renderToString(clean, { displayMode: true, throwOnError: true });
+    } catch (e) {
+      return match;
+    }
+  });
+
+  processedHtml = processedHtml.replace(/\$([^\s$](?:[^$]*[^\s$])?)\$/g, (match, formula) => {
+    try {
+      const clean = formula
+        .replace(/<[^>]*>/g, '')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'");
+      return katex.renderToString(clean, { displayMode: false, throwOnError: true });
+    } catch (e) {
+      return match;
+    }
+  });
+  
+  div.innerHTML = processedHtml;
+  
+  const placeholders = div.querySelectorAll('span[data-katex-placeholder]');
+  placeholders.forEach(placeholder => {
+    const index = parseInt(placeholder.getAttribute('data-katex-placeholder') || '-1');
+    if (index >= 0 && savedElements[index]) {
+      placeholder.parentNode?.replaceChild(savedElements[index], placeholder);
+    }
+  });
+  
+  return div.innerHTML;
 }
 
 export default function ShareBlocks({ blocks, accent, titleMap = {}, fontFamily = "'Lora', serif", isDark = false, themeId }: { blocks: SBlock[]; accent: string; titleMap?: Record<string, string>; fontFamily?: string; isDark?: boolean; themeId?: string }) {
@@ -199,7 +311,7 @@ export default function ShareBlocks({ blocks, accent, titleMap = {}, fontFamily 
                   {blk.rows.map((row, r) => (
                     <tr key={r}>
                       {row.map((cell, c) => (
-                        <td key={c} style={{ border: `1px solid ${dividerColor}`, padding: "7px 10px", color: inkColor, fontWeight: r === 0 ? 600 : 400, background: r === 0 ? "rgba(255,255,255,.04)" : "transparent", minWidth: 60 }}>{cell}</td>
+                        <td key={c} style={{ border: `1px solid ${dividerColor}`, padding: "7px 10px", color: inkColor, fontWeight: r === 0 ? 600 : 400, background: r === 0 ? "rgba(255,255,255,.04)" : "transparent", minWidth: 60 }}>{renderInline(cell, titleMap)}</td>
                       ))}
                     </tr>
                   ))}
@@ -208,17 +320,25 @@ export default function ShareBlocks({ blocks, accent, titleMap = {}, fontFamily 
             </div>
           );
         }
+        if (blk.type === "math") {
+          return (
+            <div key={bi} style={{ margin: "18px 0", padding: "8px 0", overflowX: "auto", display: "flex", justifyContent: "center" }}>
+              {renderKatex(blk.content, true)}
+            </div>
+          );
+        }
         // text block — HTML (new) or plain markdown (legacy)
         if (/<(?:div|br|strong|em|span|u)\b/i.test(blk.content)) {
+          const linkedHtml = blk.content.replace(/\[\[(.*?)\]\]/g, (match, title) => {
+            const sid = titleMap[title.toLowerCase().trim()];
+            return sid ? `<a href="/share/${sid}" class="note-link clickable">${title}</a>` : `<span class="note-link">${title}</span>`;
+          });
           return (
             <div
               key={bi}
               className="rich-read"
               style={{ fontFamily, fontSize: "1.05rem", lineHeight: 2.1, color: inkColor }}
-              dangerouslySetInnerHTML={{ __html: blk.content.replace(/\[\[(.*?)\]\]/g, (match, title) => {
-                const sid = titleMap[title.toLowerCase().trim()];
-                return sid ? `<a href="/share/${sid}" class="note-link clickable">${title}</a>` : `<span class="note-link">${title}</span>`;
-              }) }}
+              dangerouslySetInnerHTML={{ __html: formatLatexInHtml(linkedHtml) }}
             />
           );
         }

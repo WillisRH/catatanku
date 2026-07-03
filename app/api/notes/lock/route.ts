@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { validateCsrfToken } from "@/lib/csrf";
+import { invalidate, CK } from "@/lib/redis";
 import bcrypt from "bcryptjs";
 
 // POST — lock a note with a password or PIN credential
@@ -19,7 +20,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid lockType." }, { status: 400 });
 
   // Verify note ownership
-  const note = await prisma.note.findUnique({ where: { id: noteId }, select: { userId: true } });
+  const note = await prisma.note.findUnique({ where: { id: noteId }, select: { userId: true, shareId: true } });
   if (!note || note.userId !== session.user.id)
     return NextResponse.json({ error: "Not found." }, { status: 404 });
 
@@ -48,6 +49,16 @@ export async function POST(req: Request) {
     data: { isLocked: true, lockType, notePinHash },
   });
 
+  const keys = [
+    CK.userNotes(session.user.id),
+    CK.note(noteId),
+    CK.sharedNote(noteId),
+    note?.shareId ? CK.sharedNote(note.shareId) : "",
+    CK.sharedUserNotes(session.user.id),
+    CK.userPage(session.user.id),
+    CK.userPublicNotes(session.user.id),
+  ].filter(Boolean);
+  await invalidate(...keys);
   return NextResponse.json({ success: true, lockType });
 }
 
@@ -63,7 +74,7 @@ export async function DELETE(req: Request) {
   const { noteId } = await req.json();
   if (!noteId) return NextResponse.json({ error: "Missing noteId." }, { status: 400 });
 
-  const note = await prisma.note.findUnique({ where: { id: noteId }, select: { userId: true } });
+  const note = await prisma.note.findUnique({ where: { id: noteId }, select: { userId: true, shareId: true } });
   if (!note || note.userId !== session.user.id)
     return NextResponse.json({ error: "Not found." }, { status: 404 });
 
@@ -72,5 +83,15 @@ export async function DELETE(req: Request) {
     data: { isLocked: false, lockType: "password", notePinHash: null },
   });
 
+  const keys = [
+    CK.userNotes(session.user.id),
+    CK.note(noteId),
+    CK.sharedNote(noteId),
+    note?.shareId ? CK.sharedNote(note.shareId) : "",
+    CK.sharedUserNotes(session.user.id),
+    CK.userPage(session.user.id),
+    CK.userPublicNotes(session.user.id),
+  ].filter(Boolean);
+  await invalidate(...keys);
   return NextResponse.json({ success: true });
 }

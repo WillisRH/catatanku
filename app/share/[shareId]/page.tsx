@@ -5,11 +5,16 @@ import { Metadata, Viewport } from "next";
 import ShareBlocks from "./ShareBlocks";
 import { prisma } from "@/lib/prisma";
 import ShareRevokeClient from "./ShareRevokeClient";
+import { cached, CK } from "@/lib/redis";
 
 export async function generateMetadata({ params }: { params: Promise<{ shareId: string }> }): Promise<Metadata> {
   const { shareId } = await params;
   // @ts-ignore
-  const note = await prisma.note.findFirst({ where: { OR: [{ shareId }, { id: shareId, isProfilePinned: true }] } as any });
+  const note = await cached(CK.sharedNote(shareId), async () => {
+    const res = await prisma.note.findFirst({ where: { OR: [{ shareId }, { id: shareId, isProfilePinned: true }] } as any });
+    if (!res) return null;
+    return { ...res, ts: res.ts ? res.ts.toString() : null };
+  }, 30);
   if (!note || (note as any).isLocked || (note as any).isModerated) {
     return { title: "Catatanku", description: "Baca catatan di Catatanku." };
   }
@@ -46,7 +51,11 @@ export async function generateMetadata({ params }: { params: Promise<{ shareId: 
 export async function generateViewport({ params }: { params: Promise<{ shareId: string }> }): Promise<Viewport> {
   const { shareId } = await params;
   // @ts-ignore
-  const note = await prisma.note.findFirst({ where: { OR: [{ shareId }, { id: shareId, isProfilePinned: true }] } as any });
+  const note = await cached(CK.sharedNote(shareId), async () => {
+    const res = await prisma.note.findFirst({ where: { OR: [{ shareId }, { id: shareId, isProfilePinned: true }] } as any });
+    if (!res) return null;
+    return { ...res, ts: res.ts ? res.ts.toString() : null };
+  }, 30);
   if (!note || (note as any).isLocked || (note as any).isModerated) {
     return { themeColor: "#FAF6F0" };
   }
@@ -765,7 +774,11 @@ function LockedPage({ bg, accent, themeKey, theme }: { bg: string; accent: strin
 export default async function SharePage({ params }: { params: Promise<{ shareId: string }> }) {
   const { shareId } = await params;
   // @ts-ignore
-  const note = await prisma.note.findFirst({ where: { OR: [{ shareId }, { id: shareId, isProfilePinned: true }] } as any });
+  const note = await cached(CK.sharedNote(shareId), async () => {
+    const res = await prisma.note.findFirst({ where: { OR: [{ shareId }, { id: shareId, isProfilePinned: true }] } as any });
+    if (!res) return null;
+    return { ...res, ts: res.ts ? res.ts.toString() : null };
+  }, 30);
   if (!note || (note as any).isModerated) return <NotFoundPage />;
 
   const themeKey = (note as any).theme as string || '';
@@ -775,15 +788,17 @@ export default async function SharePage({ params }: { params: Promise<{ shareId:
   const mood = note.mood != null ? MOODS[note.mood] : null;
 
   // Resolve linked notes (Zettelkasten) for the public view
-  const otherShared = await (prisma.note.findMany as any)({
-    where: {
-      userId: note.userId,
-      shareId: { not: null },
-      isLocked: false,
-      isModerated: false,
-    },
-    select: { title: true, shareId: true }
-  });
+  const otherShared = await cached(CK.sharedUserNotes(note.userId), async () => {
+    return await (prisma.note.findMany as any)({
+      where: {
+        userId: note.userId,
+        shareId: { not: null },
+        isLocked: false,
+        isModerated: false,
+      },
+      select: { title: true, shareId: true }
+    });
+  }, 60);
 
   const titleMap: Record<string, string> = {};
   otherShared.forEach((n: any) => {
@@ -857,7 +872,7 @@ export default async function SharePage({ params }: { params: Promise<{ shareId:
   if (buf.length) blocks.push({ type: 'text', content: buf.join('\n') });
 
   return (
-    <div style={{ minHeight: "100vh", background: c.bg, position: "relative", color: themeKey==='kota_malam' ? '#FFFFFF' : isDark ? "rgba(228,248,246,.92)" : undefined }}>
+    <div data-theme={themeKey || undefined} style={{ minHeight: "100vh", background: c.bg, position: "relative", color: themeKey==='kota_malam' ? '#FFFFFF' : isDark ? "rgba(228,248,246,.92)" : undefined }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Lora:ital,wght@0,400;0,500;1,400&family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Merriweather:ital,wght@0,300;0,400;1,300;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&family=Nunito:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500&family=Poppins:ital,wght@0,400;0,500;1,400&family=Raleway:ital,wght@0,400;0,500;1,400&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap');
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}

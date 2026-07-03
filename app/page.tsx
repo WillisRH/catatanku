@@ -1,6 +1,10 @@
 "use client"
 
-import { useState, useEffect, useRef, useCallback, useMemo, memo } from "react";
+import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo, memo } from "react";
+import * as Y from "yjs";
+import { WebrtcProvider } from "y-webrtc";
+import { supabase } from "@/lib/supabase-client";
+import katex from "katex";
 import { createPortal } from "react-dom";
 import { calcReadingTime } from "@/lib/note-utils";
 import { useSession, signIn, signOut } from "next-auth/react";
@@ -820,6 +824,146 @@ const ThemeBg = memo(function ThemeBg({ themeId, accent }: { themeId: string; ac
           <stop offset="0%" stopColor={accent} stopOpacity=".05"/><stop offset="100%" stopColor={accent} stopOpacity="0"/>
         </linearGradient>
       </defs>
+    </svg>
+  );
+  if (themeId==='bawah_laut') return (
+    <svg className="theme-bg-svg" style={{...s,opacity:1}} viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" fill="none">
+      <defs><style>{`
+        @keyframes bwlb-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+        @keyframes bwlb-bob2{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+        @keyframes bwlb-bob3{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+        @keyframes bwlb-glow{0%,100%{opacity:.06}50%{opacity:.16}}
+        @keyframes bwlb-glow2{0%,100%{opacity:.04}50%{opacity:.11}}
+        @keyframes bwlb-tw{0%,100%{opacity:.35}50%{opacity:.78}}
+        @keyframes bwlb-rise{0%{transform:translateY(0);opacity:.5}100%{transform:translateY(-230px);opacity:0}}
+        .bwlbj1{animation:bwlb-bob 5s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+        .bwlbj2{animation:bwlb-bob2 6.5s ease-in-out infinite 1.5s;transform-box:fill-box;transform-origin:center}
+        .bwlbj3{animation:bwlb-bob3 4.5s ease-in-out infinite .8s;transform-box:fill-box;transform-origin:center}
+        .bwlbj4{animation:bwlb-bob 7s ease-in-out infinite 2.5s;transform-box:fill-box;transform-origin:center}
+        .bwlbg1{animation:bwlb-glow 4s ease-in-out infinite}.bwlbg2{animation:bwlb-glow2 5s ease-in-out infinite 1.5s}.bwlbg3{animation:bwlb-glow 3.5s ease-in-out infinite .8s}
+        .bwlbt1{animation:bwlb-tw 2.8s ease-in-out infinite}.bwlbt2{animation:bwlb-tw 3.5s ease-in-out infinite .7s}.bwlbt3{animation:bwlb-tw 2.2s ease-in-out infinite 1.2s}.bwlbt4{animation:bwlb-tw 4.1s ease-in-out infinite .4s}.bwlbt5{animation:bwlb-tw 3.0s ease-in-out infinite 1.9s}.bwlbt6{animation:bwlb-tw 2.6s ease-in-out infinite .9s}.bwlbt7{animation:bwlb-tw 3.8s ease-in-out infinite .2s}.bwlbt8{animation:bwlb-tw 2.4s ease-in-out infinite 1.5s}.bwlbt9{animation:bwlb-tw 3.2s ease-in-out infinite .6s}.bwlbt10{animation:bwlb-tw 2.0s ease-in-out infinite 1.8s}.bwlbt11{animation:bwlb-tw 2.9s ease-in-out infinite .3s}.bwlbt12{animation:bwlb-tw 3.6s ease-in-out infinite 1.0s}.bwlbt13{animation:bwlb-tw 2.7s ease-in-out infinite 1.4s}.bwlbt14{animation:bwlb-tw 4.0s ease-in-out infinite .5s}.bwlbt15{animation:bwlb-tw 2.5s ease-in-out infinite 2.2s}
+        .bwlbrise1{animation:bwlb-rise 8s ease-in infinite}.bwlbrise2{animation:bwlb-rise 12s ease-in 3s infinite}.bwlbrise3{animation:bwlb-rise 10s ease-in 6s infinite}
+      `}</style></defs>
+      <circle cx="80" cy="220" r="90" fill={accent} className="bwlbg1"/>
+      <circle cx="340" cy="480" r="75" fill={accent} className="bwlbg2"/>
+      <circle cx="160" cy="680" r="80" fill={accent} className="bwlbg3"/>
+      {([[32,48,1.2,'bwlbt1'],[88,28,1,'bwlbt2'],[152,55,1.4,'bwlbt3'],[205,35,1,'bwlbt4'],[268,52,1.5,'bwlbt5'],[338,25,1,'bwlbt6'],[58,92,1,'bwlbt7'],[128,78,1.2,'bwlbt8'],[188,105,1,'bwlbt9'],[242,88,1.3,'bwlbt10'],[302,72,1,'bwlbt11'],[28,145,1,'bwlbt12'],[378,112,1.1,'bwlbt13'],[248,148,1,'bwlbt14'],[112,162,1.2,'bwlbt15'],[42,312,1,'bwlbt1'],[188,348,1.2,'bwlbt3'],[325,328,1,'bwlbt5'],[92,448,1.1,'bwlbt7'],[252,418,1,'bwlbt2'],[372,475,1,'bwlbt4'],[132,518,1,'bwlbt6'],[285,558,1.2,'bwlbt8'],[58,582,1,'bwlbt9'],[388,612,1,'bwlbt3'],[168,638,1.1,'bwlbt1'],[308,668,1,'bwlbt5'],[82,698,1.2,'bwlbt7'],[222,725,1,'bwlbt2'],[352,755,1.1,'bwlbt4']] as [number,number,number,string][]).map(([cx,cy,r,cls],i)=>(
+        <circle key={i} className={cls} cx={cx} cy={cy} r={r} fill={accent}/>
+      ))}
+      <circle className="bwlbrise1" cx="95" cy="780" r="4" stroke={accent} strokeWidth=".8" opacity=".3"/>
+      <circle className="bwlbrise2" cx="210" cy="780" r="3" stroke={accent} strokeWidth=".7" opacity=".3"/>
+      <circle className="bwlbrise3" cx="320" cy="780" r="5" stroke={accent} strokeWidth=".8" opacity=".28"/>
+      <path d="M22,800 Q10,760 22,720 Q34,680 22,640 Q10,600 22,560 Q34,520 22,480 Q10,440 22,400" stroke={accent} strokeWidth="2" opacity=".22" strokeLinecap="round"/>
+      <path d="M45,800 Q58,770 45,740 Q32,712 45,685 Q58,658 45,630" stroke={accent} strokeWidth="1.4" opacity=".15" strokeLinecap="round"/>
+      <path d="M378,800 Q390,758 378,715 Q366,672 378,630 Q390,588 378,548 Q366,508 378,468" stroke={accent} strokeWidth="2" opacity=".2" strokeLinecap="round"/>
+      <path d="M358,800 Q345,772 358,745 Q370,718 358,692 Q345,665 358,638" stroke={accent} strokeWidth="1.4" opacity=".14" strokeLinecap="round"/>
+      <path d="M205,800 Q218,775 205,752 Q192,728 205,705 Q218,682 205,660" stroke={accent} strokeWidth="1.5" opacity=".18" strokeLinecap="round"/>
+      <g className="bwlbj1" transform="translate(200,180)">
+        <ellipse cx="0" cy="0" rx="55" ry="28" fill={accent} opacity=".12"/>
+        <ellipse cx="0" cy="2" rx="38" ry="18" fill={accent} opacity=".08"/>
+        <ellipse cx="0" cy="5" rx="22" ry="12" fill={accent} opacity=".06"/>
+        {([-32,-20,-10,0,10,20,32] as number[]).map((x,i)=>(
+          <path key={i} d={`M${x},26 Q${x+(i%2===0?6:-6)},${46+i*4} ${x},${64+i%3*8}`} stroke={accent} strokeWidth="1.2" opacity=".18" strokeLinecap="round"/>
+        ))}
+      </g>
+      <g className="bwlbj2" transform="translate(82,440)">
+        <ellipse cx="0" cy="0" rx="38" ry="20" fill={accent} opacity=".10"/>
+        <ellipse cx="0" cy="2" rx="24" ry="12" fill={accent} opacity=".07"/>
+        {([-22,-12,-2,8,18,28] as number[]).map((x,i)=>(
+          <path key={i} d={`M${x},18 Q${x+(i%2===0?4:-4)},${32+i*3} ${x},${46+i%2*6}`} stroke={accent} strokeWidth="1" opacity=".16" strokeLinecap="round"/>
+        ))}
+      </g>
+      <g className="bwlbj3" transform="translate(338,320)">
+        <ellipse cx="0" cy="0" rx="25" ry="13" fill={accent} opacity=".09"/>
+        <ellipse cx="0" cy="1" rx="16" ry="8" fill={accent} opacity=".06"/>
+        {([-14,-7,0,7,14] as number[]).map((x,i)=>(
+          <path key={i} d={`M${x},12 Q${x+(i%2===0?3:-3)},${22+i*2} ${x},${30+i%2*5}`} stroke={accent} strokeWidth=".9" opacity=".15" strokeLinecap="round"/>
+        ))}
+      </g>
+      <g className="bwlbj4" transform="translate(152,580)">
+        <ellipse cx="0" cy="0" rx="18" ry="9" fill={accent} opacity=".08"/>
+        {([-10,-4,4,10] as number[]).map((x,i)=>(
+          <path key={i} d={`M${x},8 Q${x+(i%2===0?2:-2)},${16+i*2} ${x},${22+i%2*4}`} stroke={accent} strokeWidth=".8" opacity=".14" strokeLinecap="round"/>
+        ))}
+      </g>
+      {[[72,350,5],[145,420,4],[268,388,6],[312,510,4],[88,622,5],[245,658,4],[368,720,5]].map(([x,y,r]:number[],i)=>(
+        <circle key={`bb${i}`} cx={x} cy={y} r={r} stroke={accent} strokeWidth=".8" opacity=".18"/>
+      ))}
+      <path d="M-10,775 Q40,755 90,765 Q135,750 180,762 Q225,748 275,758 Q322,745 370,755 Q390,760 415,752 L415,800 L-10,800Z" fill={accent} opacity=".08"/>
+      <path d="M80,0 L50,250" stroke={accent} strokeWidth="18" opacity=".03" strokeLinecap="round"/>
+      <path d="M200,0 L180,300" stroke={accent} strokeWidth="14" opacity=".03" strokeLinecap="round"/>
+      <path d="M320,0 L350,220" stroke={accent} strokeWidth="16" opacity=".03" strokeLinecap="round"/>
+    </svg>
+  );
+  if (themeId==='lavender_field') return (
+    <svg className="theme-bg-svg" style={{...s,opacity:1}} viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" fill={accent}>
+      <defs><style>{`
+        @keyframes lfb-fly{0%,100%{transform:translate(0,0)rotate(-8deg)}50%{transform:translate(8px,-14px)rotate(8deg)}}
+        @keyframes lfb-fly2{0%,100%{transform:translate(0,0)rotate(5deg)}50%{transform:translate(-6px,-10px)rotate(-5deg)}}
+        @keyframes lfb-sway{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
+        @keyframes lfb-drift{0%,100%{transform:translate(0,0)rotate(0deg);opacity:.12}50%{transform:translate(5px,-8px)rotate(15deg);opacity:.18}}
+        .lfbbf1{animation:lfb-fly 5s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+        .lfbbf2{animation:lfb-fly2 6.5s ease-in-out infinite 1.5s;transform-box:fill-box;transform-origin:center}
+        .lfbbf3{animation:lfb-fly 4.5s ease-in-out infinite 2.8s;transform-box:fill-box;transform-origin:center}
+        .lfbsway{animation:lfb-sway 4s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+        .lfbdrift{animation:lfb-drift 6s ease-in-out infinite}
+      `}</style></defs>
+      <path d="M-10,618 Q100,595 200,610 Q300,624 415,604 L415,800 L-10,800Z" opacity=".06"/>
+      <path d="M-10,658 Q100,638 200,652 Q300,668 415,648 L415,800 L-10,800Z" opacity=".07"/>
+      {([[22,800],[42,800],[62,800],[82,800],[102,800],[122,800],[142,800],[162,800],[182,800],[202,800],[222,800],[242,800],[262,800],[282,800],[302,800],[322,800],[342,800],[362,800],[382,800]] as number[][]).map(([x,base],i)=>{
+        const h=55+((i*7)%25);const bot=base-h;
+        return (
+          <g key={i} opacity=".12" className="lfbsway">
+            <line x1={x} y1={base} x2={x} y2={bot} stroke={accent} strokeWidth="1.3" fill="none"/>
+            {([-2,-1,0,1,2] as number[]).map((j,k)=>(
+              <ellipse key={k} cx={x+j*2.5} cy={bot+10+k*5} rx="2.5" ry="5" transform={`rotate(${j*20} ${x+j*2.5} ${bot+10+k*5})`}/>
+            ))}
+          </g>
+        );
+      })}
+      {([[32,760],[52,760],[72,760],[92,760],[112,760],[132,760],[152,760],[172,760],[192,760],[212,760],[232,760],[252,760],[272,760],[292,760],[312,760],[332,760],[352,760],[372,760]] as number[][]).map(([x,base],i)=>{
+        const h=45+((i*5)%20);const bot=base-h;
+        return (
+          <g key={i} opacity=".08">
+            <line x1={x} y1={base} x2={x} y2={bot} stroke={accent} strokeWidth="1" fill="none"/>
+            {([-1,0,1] as number[]).map((j,k)=>(
+              <ellipse key={k} cx={x+j*2} cy={bot+8+k*5} rx="2" ry="4" transform={`rotate(${j*15} ${x+j*2} ${bot+8+k*5})`}/>
+            ))}
+          </g>
+        );
+      })}
+      <g className="lfbbf1" transform="translate(188,260)">
+        <ellipse cx="-14" cy="-4" rx="20" ry="13" opacity=".14" transform="rotate(-22 -14 -4)"/>
+        <ellipse cx="14" cy="-4" rx="20" ry="13" opacity=".14" transform="rotate(22 14 -4)"/>
+        <ellipse cx="-9" cy="8" rx="11" ry="7.5" opacity=".11" transform="rotate(28 -9 8)"/>
+        <ellipse cx="9" cy="8" rx="11" ry="7.5" opacity=".11" transform="rotate(-28 9 8)"/>
+        <line x1="0" y1="-15" x2="0" y2="12" stroke={accent} strokeWidth="1" fill="none" opacity=".2"/>
+      </g>
+      <g className="lfbbf2" transform="translate(318,380)">
+        <ellipse cx="-10" cy="-3" rx="14" ry="9" opacity=".12" transform="rotate(-18 -10 -3)"/>
+        <ellipse cx="10" cy="-3" rx="14" ry="9" opacity=".12" transform="rotate(18 10 -3)"/>
+        <ellipse cx="-7" cy="6" rx="8" ry="5.5" opacity=".1" transform="rotate(22 -7 6)"/>
+        <ellipse cx="7" cy="6" rx="8" ry="5.5" opacity=".1" transform="rotate(-22 7 6)"/>
+        <line x1="0" y1="-10" x2="0" y2="9" stroke={accent} strokeWidth=".9" fill="none" opacity=".18"/>
+      </g>
+      <g className="lfbbf3" transform="translate(72,480)">
+        <ellipse cx="-12" cy="-3" rx="17" ry="11" opacity=".12" transform="rotate(-20 -12 -3)"/>
+        <ellipse cx="12" cy="-3" rx="17" ry="11" opacity=".12" transform="rotate(20 12 -3)"/>
+        <ellipse cx="-8" cy="7" rx="9" ry="6" opacity=".1" transform="rotate(25 -8 7)"/>
+        <ellipse cx="8" cy="7" rx="9" ry="6" opacity=".1" transform="rotate(-25 8 7)"/>
+        <line x1="0" y1="-12" x2="0" y2="10" stroke={accent} strokeWidth="1" fill="none" opacity=".18"/>
+      </g>
+      {[[65,128,30],[155,195,65],[278,142,15],[348,245,80],[112,318,45],[302,355,10],[188,418,70],[58,522,35],[352,508,55],[142,598,20]].map(([x,y,rot]:number[],i)=>(
+        <ellipse key={`p${i}`} cx={x} cy={y} rx="5" ry="3" transform={`rotate(${rot} ${x} ${y})`} className="lfbdrift" opacity=".12"/>
+      ))}
+      {[[28,48,1.5,.5],[372,62,1.3,.46],[18,185,1.5,.5],[385,205,1.3,.46],[198,105,1.2,.44],[52,358,1,.4],[348,402,1.2,.42],[108,505,1,.4],[292,542,1.1,.42],[158,645,1,.38]].map(([x,y,r,op]:number[],i)=>(
+        <circle key={`d${i}`} cx={x} cy={y} r={r} opacity={op}/>
+      ))}
+      {[[60,88,1],[210,58,1.1],[340,95,.9]].map(([cx,cy,sc]:number[],i)=>(
+        <g key={`c${i}`} transform={`translate(${cx},${cy})scale(${sc})`} opacity=".06">
+          <circle cx="0" cy="0" r="18"/><circle cx="18" cy="-5" r="14"/><circle cx="-18" cy="-5" r="12"/><circle cx="8" cy="-14" r="10"/>
+        </g>
+      ))}
     </svg>
   );
   return null;
@@ -1820,7 +1964,9 @@ type Block =
   | { type: 'image'; url: string; size?: 'sm' | 'md' | 'lg' | 'full'; align?: 'left' | 'center' | 'right' }
   | { type: 'gallery'; cols: 2 | 3; urls: string[] }
   | { type: 'link'; url: string; title?: string; description?: string; image?: string; favicon?: string }
-  | { type: 'table'; rows: string[][] };
+  | { type: 'table'; rows: string[][] }
+  | { type: 'divider' }
+  | { type: 'math'; content: string };
 
 const VALID_SIZES = new Set(['sm','md','lg','full']);
 const VALID_ALIGNS = new Set(['left','center','right']);
@@ -1831,11 +1977,41 @@ const parseBlocks = (raw: string): Block[] => {
   const pre = (raw || '')
     .replace(/<div[^>]*>(\[(?:IMAGE|GALLERY):[^\]]+\])<\/div>/gi, '\n$1\n')
     .replace(/([^\n])(\[(?:IMAGE|GALLERY):[^\]]+\])/g, '$1\n$2')
-    .replace(/(\[(?:IMAGE|GALLERY):[^\]]+\])(?=[^\n])/g, '$1\n');
+    .replace(/(\[(?:IMAGE|GALLERY):[^\]]+\])(?=[^\n])/g, '$1\n')
+    // Convert legacy <hr> tags into clean markdown horizontal rules on their own line to prevent parsing loss
+    .replace(/<hr[^>]*>/gi, '\n---\n');
   const lines = pre.split('\n');
   const out: Block[] = [];
   let buf: string[] = [];
+  
+  let inMathBlock = false;
+  let mathBuf: string[] = [];
+
   for (const line of lines) {
+    const trimmed = line.trim();
+
+    if (inMathBlock) {
+      if (trimmed === '$$' || trimmed.endsWith('$$')) {
+        const content = trimmed === '$$' ? mathBuf.join('\n') : [...mathBuf, trimmed.slice(0, -2)].join('\n');
+        out.push({ type: 'math', content });
+        mathBuf = [];
+        inMathBlock = false;
+      } else {
+        mathBuf.push(line);
+      }
+      continue;
+    }
+
+    if (trimmed.startsWith('$$')) {
+      if (buf.length) { out.push({ type: 'text', content: buf.join('\n') }); buf = []; }
+      if (trimmed.endsWith('$$') && trimmed.length > 2) {
+        out.push({ type: 'math', content: trimmed.slice(2, -2) });
+      } else {
+        inMathBlock = true;
+      }
+      continue;
+    }
+
     if (line.startsWith('[IMAGE:') && line.endsWith(']')) {
       if (buf.length) { out.push({ type: 'text', content: buf.join('\n') }); buf = []; }
       const parts = line.slice(7, -1).split('|');
@@ -1868,9 +2044,15 @@ const parseBlocks = (raw: string): Block[] => {
     } else if (/^--x?\s/.test(line) || line === '--' || line === '--x') {
       if (buf.length) { out.push({ type: 'text', content: buf.join('\n') }); buf = []; }
       out.push({ type: 'todo', done: line.startsWith('--x'), content: line.replace(/^--x?\s?/, '') });
+    } else if (/^[-*_]{3,}$/.test(line.trim()) && line.trim() !== '') {
+      if (buf.length) { out.push({ type: 'text', content: buf.join('\n') }); buf = []; }
+      out.push({ type: 'divider' });
     } else {
       buf.push(line);
     }
+  }
+  if (inMathBlock) {
+    buf.push('$$' + mathBuf.join('\n'));
   }
   if (buf.length) out.push({ type: 'text', content: buf.join('\n') });
   if (!out.length) out.push({ type: 'text', content: '' });
@@ -1887,6 +2069,8 @@ const blocksToText = (blocks: Block[]): string =>
     b.type === 'gallery' ? `[GALLERY:${b.cols}|${b.urls.join('|')}]` :
     b.type === 'link' ? `[LINK:${b.url}|${encCell(b.title||'')}|${encCell(b.description||'')}|${encCell(b.image||'')}|${encCell(b.favicon||'')}]` :
     b.type === 'table' ? `[TABLE:${b.rows.length}x${b.rows[0]?.length||0}|${b.rows.flat().map(encCell).join('|')}]` :
+    b.type === 'divider' ? '---' :
+    b.type === 'math' ? `$$\n${b.content}\n$$` :
     b.content
   ).join('\n');
 
@@ -1915,6 +2099,7 @@ const getLinkImage = (text: string): string => {
 const getPreviewText = (text: string) =>
   (text || '').split('\n').map(l => {
     if (l.startsWith('[IMAGE:') || l.startsWith('[GALLERY:')) return '';
+    if (l.includes('<hr') || /^[-*_]{3,}$/.test(l.trim())) return '';
     if (l.startsWith('[LINK:') && l.endsWith(']')) {
       const parts = l.slice(6, -1).split('|');
       return decCell(parts[1] || '') || parts[0] || '';
@@ -1934,12 +2119,21 @@ function parseLineStyle(line: string): { align: 'left'|'center'|'right'; text: s
   return { align: 'left', text: line };
 }
 
+function renderKatex(math: string, displayMode: boolean): React.ReactNode {
+  try {
+    const html = katex.renderToString(math, { displayMode, throwOnError: true });
+    return <span dangerouslySetInnerHTML={{ __html: html }} />;
+  } catch (e) {
+    return <span>{displayMode ? `$$${math}$$` : `$${math}$`}</span>;
+  }
+}
+
 function renderInline(raw: string): React.ReactNode {
   const hasMarkup = raw.includes('**') || raw.includes('_') || raw.includes('<u>') ||
-    raw.includes('~~') || raw.includes('`') || raw.includes('[') || raw.includes('[[');
+    raw.includes('~~') || raw.includes('`') || raw.includes('[') || raw.includes('[[') || raw.includes('$');
   if (!hasMarkup) return raw;
   const parts: React.ReactNode[] = [];
-  const re = /\[\[(.+?)\]\]|\*\*\*(.+?)\*\*\*|\*\*(.+?)\*\*|~~(.+?)~~|`([^`]+)`|\[([^\]]+)\]\((https?:\/\/[^\)]+)\)|_(.+?)_|<u>(.+?)<\/u>/g;
+  const re = /\[\[(.+?)\]\]|\*\*\*(.+?)\*\*\*|\*\*(.+?)\*\*|~~(.+?)~~|`([^`]+)`|\[([^\]]+)\]\((https?:\/\/[^\)]+)\)|_(.+?)_|<u>(.+?)<\/u>|\$([^\s$](?:[^$]*[^\s$])?)\$/g;
   let last = 0; let m: RegExpExecArray | null;
   while ((m = re.exec(raw)) !== null) {
     if (m.index > last) parts.push(raw.slice(last, m.index));
@@ -1950,13 +2144,114 @@ function renderInline(raw: string): React.ReactNode {
     else if (m[5] !== undefined) parts.push(<code key={m.index} style={{background:'var(--surface2,rgba(0,0,0,0.07))',color:'var(--ink)',borderRadius:4,padding:'1px 5px',fontFamily:'monospace',fontSize:'0.88em'}}>{m[5]}</code>);
     else if (m[6] !== undefined) parts.push(<a key={m.index} href={m[7]} target="_blank" rel="noopener noreferrer" style={{color:'var(--accent)',textDecoration:'underline',textDecorationColor:'rgba(196,149,106,0.4)'}}>{m[6]}</a>);
     else if (m[8] !== undefined) parts.push(<em key={m.index} style={{fontStyle:'italic'}}>{m[8]}</em>);
-    else parts.push(<u key={m.index}>{m[9]}</u>);
+    else if (m[9] !== undefined) parts.push(<u key={m.index}>{m[9]}</u>);
+    else if (m[10] !== undefined) parts.push(<React.Fragment key={m.index}>{renderKatex(m[10], false)}</React.Fragment>);
     last = m.index + m[0].length;
   }
   if (last < raw.length) parts.push(raw.slice(last));
   if (parts.length === 0) return '';
   if (parts.length === 1) return parts[0];
   return <>{parts}</>;
+}
+
+function renderLatexInText(text: string): string {
+  let processed = text;
+  
+  // 1. Block math: $$ ... $$
+  processed = processed.replace(/\$\$([\s\S]+?)\$\$/g, (match, formula) => {
+    try {
+      const clean = formula
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'");
+      return katex.renderToString(clean, { displayMode: true, throwOnError: true });
+    } catch (e) {
+      return match;
+    }
+  });
+
+  // 2. Inline math: $ ... $
+  processed = processed.replace(/\$([^\s$](?:[^$]*[^\s$])?)\$/g, (match, formula) => {
+    try {
+      const clean = formula
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'");
+      return katex.renderToString(clean, { displayMode: false, throwOnError: true });
+    } catch (e) {
+      return match;
+    }
+  });
+
+  return processed;
+}
+
+function formatLatexInHtml(html: string): string {
+  if (typeof document === 'undefined') return html;
+  
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  
+  const savedElements: Element[] = [];
+  const codeNodes = div.querySelectorAll('pre, code');
+  codeNodes.forEach((node, index) => {
+    const placeholder = document.createElement('span');
+    placeholder.setAttribute('data-katex-placeholder', index.toString());
+    node.parentNode?.replaceChild(placeholder, node);
+    savedElements[index] = node;
+  });
+  
+  let processedHtml = div.innerHTML;
+  
+  processedHtml = processedHtml.replace(/\$\$([\s\S]+?)\$\$/g, (match, formula) => {
+    try {
+      const clean = formula
+        .replace(/<[^>]*>/g, '')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'");
+      return katex.renderToString(clean, { displayMode: true, throwOnError: true });
+    } catch (e) {
+      return match;
+    }
+  });
+
+  processedHtml = processedHtml.replace(/\$([^\s$](?:[^$]*[^\s$])?)\$/g, (match, formula) => {
+    try {
+      const clean = formula
+        .replace(/<[^>]*>/g, '')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'");
+      return katex.renderToString(clean, { displayMode: false, throwOnError: true });
+    } catch (e) {
+      return match;
+    }
+  });
+  
+  div.innerHTML = processedHtml;
+  
+  const placeholders = div.querySelectorAll('span[data-katex-placeholder]');
+  placeholders.forEach(placeholder => {
+    const index = parseInt(placeholder.getAttribute('data-katex-placeholder') || '-1');
+    if (index >= 0 && savedElements[index]) {
+      placeholder.parentNode?.replaceChild(savedElements[index], placeholder);
+    }
+  });
+  
+  return div.innerHTML;
 }
 
 function AlignIcon({ align }: { align: 'left'|'center'|'right'|'justify' }) {
@@ -2027,7 +2322,7 @@ function markdownToBlocks(md: string): Block[] {
     // Horizontal rule
     if (/^[-*_]{3,}$/.test(line.trim()) && line.trim() !== '') {
       flushPara();
-      result.push({ type: 'text', content: '<div><hr style="border:none;border-top:1.5px solid var(--line);margin:6px 0"/></div>' });
+      result.push({ type: 'divider' });
       continue;
     }
 
@@ -2150,7 +2445,29 @@ function quickLooksLikeMarkdown(text: string): boolean {
   return false;
 }
 
-const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadImage, onDone, onShowToast, placeholder, autoFocus, fontSize: fz = 1.05, fontFamily: ff = "'Lora', serif" }: { entries: Record<string, any>; text: string; onChange: (t: string) => void; onUploadImage: (file: File) => Promise<string>; onDone?: () => void; onShowToast?: (msg: string) => void; placeholder?: string; autoFocus?: boolean; fontSize?: number; fontFamily?: string }) {
+const slashOptions = [
+  { id: 'h1', label: 'Heading 1', sub: 'Besar', icon: 'H1' },
+  { id: 'h2', label: 'Heading 2', sub: 'Sedang', icon: 'H2' },
+  { id: 'h3', label: 'Heading 3', sub: 'Kecil', icon: 'H3' },
+  { id: 'todo', label: 'To-do List', sub: 'Checklist', icon: '✓' },
+  { id: 'image', label: 'Gambar', sub: 'Unggah foto', icon: '🖼️' },
+  { id: 'gallery', label: 'Galeri', sub: 'Banyak foto', icon: '📷' },
+  { id: 'table', label: 'Tabel', sub: 'Data grid', icon: '📊' },
+  { id: 'linking', label: 'Tautkan Catatan', sub: 'Hubungkan catatan', icon: '🔗' },
+  { id: 'divider', label: 'Pemisah', sub: 'Garis horisontal', icon: '—' },
+];
+
+const BlockControls = memo(function BlockControls({ i, totalBlocks, onMove, onDel }: { i: number; totalBlocks: number; onMove: (i: number, dir: -1 | 1) => void; onDel: (i: number) => void }) {
+  return (
+    <div style={{ display: 'flex', gap: 2, opacity: 0, transition: 'opacity .15s' }} className="blk-ctrl">
+      <button onClick={() => onMove(i, -1)} disabled={i === 0} style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--ink3)', padding: '2px 4px', fontSize: '.72rem', borderRadius: 4 }}>↑</button>
+      <button onClick={() => onMove(i, 1)} disabled={i === totalBlocks - 1} style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--ink3)', padding: '2px 4px', fontSize: '.72rem', borderRadius: 4 }}>↓</button>
+      <button onClick={() => onDel(i)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#C27054', padding: '2px 4px', fontSize: '.72rem', borderRadius: 4 }}>✕</button>
+    </div>
+  );
+});
+
+const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadImage, onDone, onShowToast, placeholder, autoFocus, fontSize: fz = 1.05, fontFamily: ff = "'Lora', serif", remoteCursors = {}, onCursorChange }: { entries: Record<string, any>; text: string; onChange: (t: string) => void; onUploadImage: (file: File) => Promise<string>; onDone?: () => void; onShowToast?: (msg: string) => void; placeholder?: string; autoFocus?: boolean; fontSize?: number; fontFamily?: string; remoteCursors?: Record<string,any>; onCursorChange?: (cursor: {blockIndex:number;charOffset:number}|null) => void; }) {
   // Memoize block parsing to avoid re-parsing on every render
   const blocks = useMemo(() => parseBlocks(text), [text]);
   // Tracks the latest blocks immediately (even during debounce window) so handlers always operate on current state
@@ -2160,12 +2477,12 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
   const lastExternalTextRef = useRef(text);
   useEffect(() => {
     if (text !== lastExternalTextRef.current) {
-      localBlocksRef.current = parseBlocks(text);
+      localBlocksRef.current = blocks; // reuse memoized parse result
       lastExternalTextRef.current = text;
       historyRef.current = [text];
       historyPosRef.current = 0;
     }
-  }, [text]);
+  }, [text, blocks]);
 
   // Debounced emit to reduce re-renders during rapid input changes
   const emitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -2187,6 +2504,91 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
   const historyPosRef = useRef<number>(0);
   const historyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [focusedIdx, setFocusedIdx] = useState<number>(0);
+  const focusedIdxRef = useRef<number>(0);
+  const lastInputTimeRef = useRef<number>(0);
+  const setFocusedIdxBoth = (idx: number) => { focusedIdxRef.current = idx; setFocusedIdx(idx); };
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      if (emitTimeoutRef.current) clearTimeout(emitTimeoutRef.current);
+      if (onChangeDebouncedRef.current) clearTimeout(onChangeDebouncedRef.current);
+      if (historyTimerRef.current) clearTimeout(historyTimerRef.current);
+    };
+  }, []);
+
+
+  // Report cursor as a layout-independent character offset within the block.
+  // The receiver recomputes pixel position on their own DOM so window-width reflow doesn't matter.
+  const reportCursor = useCallback((blockIndex: number) => {
+    if (!onCursorChange) return;
+    const sel = window.getSelection();
+    if (!sel?.rangeCount) { onCursorChange({ blockIndex, charOffset: 0 }); return; }
+    const range = sel.getRangeAt(0);
+    const blockEl = refs.current[blockIndex];
+    if (!blockEl) { onCursorChange({ blockIndex, charOffset: 0 }); return; }
+    let charOffset = 0;
+    const walker = document.createTreeWalker(blockEl, NodeFilter.SHOW_TEXT, null);
+    let node: Node | null;
+    let found = false;
+    while ((node = walker.nextNode())) {
+      if (node === range.startContainer) { charOffset += range.startOffset; found = true; break; }
+      charOffset += (node as Text).length;
+    }
+    if (!found) charOffset += range.startOffset;
+    onCursorChange({ blockIndex, charOffset });
+  }, [onCursorChange]);
+
+  // Compute pixel x,y for a remote cursor from its charOffset on THIS screen's DOM layout.
+  const getCursorPixelPos = useCallback((blockIndex: number, charOffset: number): { x: number; y: number; h: number } => {
+    const blockEl = refs.current[blockIndex];
+    const editorEl = editorRef.current;
+    if (!blockEl || !editorEl) return { x: 0, y: 0, h: 18 };
+    const editorRect = editorEl.getBoundingClientRect();
+    const walker = document.createTreeWalker(blockEl, NodeFilter.SHOW_TEXT, null);
+    let remaining = charOffset;
+    let node: Node | null;
+    while ((node = walker.nextNode())) {
+      const len = (node as Text).length;
+      if (remaining <= len) {
+        try {
+          const r = document.createRange();
+          r.setStart(node, remaining);
+          r.collapse(true);
+          let rect = r.getBoundingClientRect();
+          if (rect.height === 0) {
+            const sp = document.createElement('span');
+            sp.appendChild(document.createTextNode('​'));
+            r.insertNode(sp);
+            rect = sp.getBoundingClientRect();
+            sp.parentNode?.removeChild(sp);
+          }
+          return { x: Math.round(rect.left - editorRect.left), y: Math.round(rect.top - editorRect.top), h: Math.round(rect.height) || 18 };
+        } catch { return { x: 0, y: 0, h: 18 }; }
+      }
+      remaining -= len;
+    }
+    try {
+      const r = document.createRange();
+      r.selectNodeContents(blockEl);
+      r.collapse(false);
+      const rect = r.getBoundingClientRect();
+      return { x: Math.round(rect.left - editorRect.left), y: Math.round(rect.top - editorRect.top), h: 18 };
+    } catch { return { x: 0, y: 0, h: 18 }; }
+  }, []);
+
+  // Compute remote cursor pixel positions after each DOM commit so positions reflect the current text layout.
+  const [computedCursorPositions, setComputedCursorPositions] = useState<Record<string,{x:number;y:number;h:number}>>({});
+  useLayoutEffect(() => {
+    const keys = Object.keys(remoteCursors);
+    if (keys.length === 0) { setComputedCursorPositions({}); return; }
+    const next: Record<string,{x:number;y:number;h:number}> = {};
+    Object.values(remoteCursors).forEach((c: any) => {
+      next[c.userId ?? c.name] = getCursorPixelPos(c.blockIndex ?? 0, c.charOffset ?? 0);
+    });
+    setComputedCursorPositions(next);
+  }, [remoteCursors, text]); // eslint-disable-line
+
   const [slash, setSlash] = useState<{ visible: boolean; mode: 'command' | 'linking'; query: string; selected: number; idx: number; x: number; y: number }>({ visible: false, mode: 'command', query: '', selected: 0, idx: -1, x: 0, y: 0 });
   const slashMenuRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -2195,6 +2597,17 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
     const item = items[slash.selected];
     if (item) item.scrollIntoView({ block: 'nearest' });
   }, [slash.selected, slash.visible]);
+
+  // Click outside to dismiss slash menu (Bug 8)
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (slash.visible && slashMenuRef.current && !slashMenuRef.current.contains(e.target as Node)) {
+        setSlash(s => ({ ...s, visible: false }));
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, [slash.visible]);
 
   // ── Floating selection toolbar ──
   const [selToolbar, setSelToolbar] = useState<{ visible: boolean; x: number; y: number; showAbove: boolean }>({ visible: false, x: 0, y: 0, showAbove: true });
@@ -2222,35 +2635,40 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
     } catch(_) {}
   };
   useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | null = null;
     const onSelChange = () => {
-      const sel = window.getSelection();
-      if (!sel || sel.isCollapsed || !sel.toString().trim()) {
-        setSelToolbar(t => t.visible ? { ...t, visible: false } : t);
-      }
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        const sel = window.getSelection();
+        if (!sel || sel.isCollapsed || !sel.toString().trim()) {
+          setSelToolbar(t => t.visible ? { ...t, visible: false } : t);
+        }
+      }, 100);
     };
     document.addEventListener('selectionchange', onSelChange);
-    return () => document.removeEventListener('selectionchange', onSelChange);
+    return () => {
+      if (timer) clearTimeout(timer);
+      document.removeEventListener('selectionchange', onSelChange);
+    };
   }, []);
 
-  const slashOptions = [
-    { id: 'h1', label: 'Heading 1', sub: 'Besar', icon: 'H1' },
-    { id: 'h2', label: 'Heading 2', sub: 'Sedang', icon: 'H2' },
-    { id: 'h3', label: 'Heading 3', sub: 'Kecil', icon: 'H3' },
-    { id: 'todo', label: 'To-do List', sub: 'Checklist', icon: '✓' },
-    { id: 'image', label: 'Gambar', sub: 'Unggah foto', icon: '🖼️' },
-    { id: 'gallery', label: 'Galeri', sub: 'Banyak foto', icon: '📷' },
-    { id: 'table', label: 'Tabel', sub: 'Data grid', icon: '📊' },
-    { id: 'linking', label: 'Tautkan Catatan', sub: 'Hubungkan catatan', icon: '🔗' },
-    { id: 'divider', label: 'Pemisah', sub: 'Garis horisontal', icon: '—' },
-  ];
   const [fmtState, setFmtState] = useState<{ bold: boolean; italic: boolean; underline: boolean; align: 'left'|'center'|'right'|'justify'; strike: boolean; code: boolean }>({ bold: false, italic: false, underline: false, align: 'left', strike: false, code: false });
-  const filteredOptions = slash.mode === 'linking'
-    ? Object.values(entries)
+  const filteredOptions = useMemo(() => {
+    if (slash.mode === 'linking') {
+      return Object.values(entries)
         .filter((e: any) => (e.title || "Tanpa Judul").toLowerCase().includes(slash.query.toLowerCase()))
-        .sort((a:any, b:any) => b.ts - a.ts)
+        .sort((a: any, b: any) => b.ts - a.ts)
         .slice(0, 10)
-        .map((e: any) => ({ id: `note-${e.id}`, label: e.title || "Tanpa Judul", sub: "Tautkan catatan ini", icon: "📄", title: e.title }))
-    : slashOptions.filter(o => o.label.toLowerCase().includes(slash.query.toLowerCase()));
+        .map((e: any) => ({ 
+          id: `note-${e.id}`, 
+          label: e.title || "Tanpa Judul", 
+          sub: e.isCollab ? "Catatan Kolaborasi" : "Tautkan catatan ini", 
+          icon: e.isCollab ? "👥" : "📄", 
+          title: e.title 
+        }));
+    }
+    return slashOptions.filter(o => o.label.toLowerCase().includes(slash.query.toLowerCase()));
+  }, [slash.mode, slash.query, entries]);
   const [isRecording, setIsRecording] = useState(false);
   const recognitionRef = useRef<any>(null);
   const [linkLoading, setLinkLoading] = useState(false);
@@ -2270,7 +2688,8 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
     })();
   };
 
-  const syncFmt = () => {
+  const syncFmtRafRef = useRef<number | null>(null);
+  const syncFmtImmediate = () => {
     try {
       const bold = document.queryCommandState('bold');
       const italic = document.queryCommandState('italic');
@@ -2282,7 +2701,7 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
       let strike = false, code = false;
       const sel = window.getSelection();
       if (sel && sel.rangeCount > 0) {
-        const fi = focusedIdx;
+        const fi = focusedIdxRef.current;
         const elFmt = refs.current[fi] as HTMLDivElement;
         let node: Node | null = sel.getRangeAt(0).commonAncestorContainer;
         if (node?.nodeType === Node.TEXT_NODE) node = node.parentElement;
@@ -2297,6 +2716,10 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
         prev.bold === bold && prev.italic === italic && prev.underline === underline && prev.align === align && prev.strike === strike && prev.code === code
           ? prev : { bold, italic, underline, align, strike, code });
     } catch(_) {}
+  };
+  const syncFmt = () => {
+    if (syncFmtRafRef.current) cancelAnimationFrame(syncFmtRafRef.current);
+    syncFmtRafRef.current = requestAnimationFrame(() => { syncFmtRafRef.current = null; syncFmtImmediate(); });
   };
 
   const toggleVoice = () => {
@@ -2344,7 +2767,10 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
     if (typeof document === 'undefined') return html;
     const tmp = document.createElement('div');
     tmp.innerHTML = html;
-    // Strip unwanted inline styles, keep only font-weight, font-style, text-align, font-size
+    // Normalize <b>/<i> → <strong>/<em> for consistent cross-browser round-trips
+    tmp.querySelectorAll('b').forEach(el => { const s = document.createElement('strong'); s.append(...Array.from(el.childNodes)); el.replaceWith(s); });
+    tmp.querySelectorAll('i').forEach(el => { const s = document.createElement('em'); s.append(...Array.from(el.childNodes)); el.replaceWith(s); });
+    // Strip unwanted inline styles, keep only font-weight, font-style, text-align, text-decoration, font-size
     tmp.querySelectorAll<HTMLElement>('[style]').forEach(el => {
       const { fontWeight, fontStyle, textAlign, textDecoration, fontSize } = el.style;
       el.removeAttribute('style');
@@ -2364,7 +2790,7 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
   // Convert legacy plain-text content (with \n line breaks) to HTML divs for contenteditable
   const normalizePlainToHtml = (content: string): string => {
     // If it looks like HTML, we still want to sanitize it before returning
-    if (/<(?:div|br|strong|em|span|u|code|hr|s|a|pre|h[1-6])\b/i.test(content)) {
+    if (/<(?:div|br|strong|em|b|i|span|u|code|hr|s|a|pre|h[1-6])\b/i.test(content)) {
       return sanitizeCeHtml(content);
     }
     return content.split('\n').map(line => {
@@ -2392,8 +2818,8 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
   };
 
   const applyInline = (cmd: 'bold'|'italic'|'underline') => {
-    const fi = focusedIdx;
-    if (blocks[fi]?.type !== 'text') return;
+    const fi = focusedIdxRef.current;
+    if (localBlocksRef.current[fi]?.type !== 'text') return;
     const el = refs.current[fi] as HTMLDivElement;
     if (!el) return;
     document.execCommand(cmd, false);
@@ -2402,8 +2828,8 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
   };
 
   const applyTextAlign = (align: 'left'|'center'|'right'|'justify') => {
-    const fi = focusedIdx;
-    if (blocks[fi]?.type !== 'text') return;
+    const fi = focusedIdxRef.current;
+    if (localBlocksRef.current[fi]?.type !== 'text') return;
     const el = refs.current[fi] as HTMLDivElement;
     if (!el) return;
     const cmd = align === 'center' ? 'justifyCenter' : align === 'right' ? 'justifyRight' : align === 'justify' ? 'justifyFull' : 'justifyLeft';
@@ -2419,8 +2845,8 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
   const focusAt = (idx: number) => setTimeout(() => (refs.current[idx] as HTMLElement)?.focus(), 10);
 
   const wrapSelection = (tag: 's'|'code'|'a', href?: string) => {
-    const fi = focusedIdx;
-    if (blocks[fi]?.type !== 'text') return;
+    const fi = focusedIdxRef.current;
+    if (localBlocksRef.current[fi]?.type !== 'text') return;
     const el = refs.current[fi] as HTMLDivElement;
     if (!el) return;
 
@@ -2465,8 +2891,8 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
   };
 
   const applyHeading = (level: number) => {
-    const fi = focusedIdx;
-    if (blocks[fi]?.type !== 'text') return;
+    const fi = focusedIdxRef.current;
+    if (localBlocksRef.current[fi]?.type !== 'text') return;
     const el = refs.current[fi] as HTMLDivElement;
     if (!el) return;
     el.focus();
@@ -2505,12 +2931,16 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
       historyTimerRef.current = setTimeout(commit, 600);
     }
   };
+  const clearDataLast = () => {
+    refs.current.forEach(el => { if (el) el.removeAttribute('data-last'); });
+  };
   const undoHistory = () => {
     if (historyPosRef.current <= 0) return;
     historyPosRef.current--;
     const t = historyRef.current[historyPosRef.current];
     localBlocksRef.current = parseBlocks(t);
     lastExternalTextRef.current = t; // prevent useEffect([text]) from wiping history
+    clearDataLast(); // force DOM re-render on next cycle
     onChange(t);
   };
   const execSlashCommand = (id: string, blockIdx: number) => {
@@ -2526,8 +2956,8 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
       }
 
       if (id.startsWith('note-')) {
-        const noteId = id.replace('note-', '');
-        const noteTitle = (filteredOptions[slash.selected] as any)?.title || 'Catatan';
+        const opt = filteredOptions.find(o => o.id === id);
+        const noteTitle = (opt as any)?.title || 'Catatan';
         // Backspace the slash and query
         const len = slash.query.length + 1;
         for (let k = 0; k < len; k++) document.execCommand('delete', false);
@@ -2579,17 +3009,21 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
       savedSplitRef.current = null;
 
       if (id === 'divider') {
-        const item: Block = { type: 'text', content: '<hr style="border:none;border-top:1.5px solid var(--line);margin:12px 0">' };
+        const item: Block = { type: 'divider' };
         if (s) {
           const nb2 = [...localBlocksRef.current];
           nb2[blockIdx] = { type: 'text', content: s.before || '<br>' };
           nb2.splice(blockIdx + 1, 0, item);
-          const afterC = s.after.replace(/<br\s*\/?>/gi, '').trim();
-          if (afterC) nb2.splice(blockIdx + 2, 0, { type: 'text', content: s.after });
+          const afterContent = s.after.replace(/<br\s*\/?>/gi, '').trim();
+          // Always insert a text block after the divider so the user can continue typing
+          nb2.splice(blockIdx + 2, 0, { type: 'text', content: afterContent || '' });
           emit(nb2);
+          setTimeout(() => focusAt(blockIdx + 2), 30);
         } else {
           nb.splice(blockIdx + 1, 0, item);
+          nb.splice(blockIdx + 2, 0, { type: 'text', content: '' });
           emit(nb);
+          setTimeout(() => focusAt(blockIdx + 2), 30);
         }
       } else if (id === 'image') {
         savedSplitRef.current = s; // Persist for handleFile
@@ -2623,11 +3057,12 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
     const t = historyRef.current[historyPosRef.current];
     localBlocksRef.current = parseBlocks(t);
     lastExternalTextRef.current = t; // prevent useEffect([text]) from wiping history
+    clearDataLast(); // force DOM re-render on next cycle
     onChange(t);
   };
   const onChangeDebouncedRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // debounce=true for text typing, false for block ops
-  const emit = (nb: Block[], debounce = false) => {
+  const emit = useCallback((nb: Block[], debounce = false) => {
     if (!nb.length) nb.push({ type: 'text', content: '' });
     localBlocksRef.current = nb; // Always update immediately so ref callback never resets DOM
     const t = blocksToText(nb);
@@ -2640,9 +3075,9 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
       if (onChangeDebouncedRef.current) { clearTimeout(onChangeDebouncedRef.current); onChangeDebouncedRef.current = null; }
       onChange(t);
     }
-  };
-  const del = (i: number) => { const nb = localBlocksRef.current.filter((_, j) => j !== i); emit(nb); };
-  const move = (i: number, dir: -1 | 1) => { const cur = localBlocksRef.current; if (i + dir < 0 || i + dir >= cur.length) return; const nb = [...cur]; [nb[i], nb[i + dir]] = [nb[i + dir], nb[i]]; emit(nb); };
+  }, [onChange]);
+  const del = useCallback((i: number) => { const nb = localBlocksRef.current.filter((_, j) => j !== i); emit(nb); }, [emit]);
+  const move = useCallback((i: number, dir: -1 | 1) => { const cur = localBlocksRef.current; if (i + dir < 0 || i + dir >= cur.length) return; const nb = [...cur]; [nb[i], nb[i + dir]] = [nb[i + dir], nb[i]]; emit(nb); }, [emit]);
 
   // Smart move for image/gallery: steps one paragraph at a time through adjacent text blocks
   const moveMedia = (i: number, dir: -1 | 1) => {
@@ -2783,14 +3218,6 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
     savedSplitRef.current = null;
   };
 
-  const BlockControls = ({ i }: { i: number }) => (
-    <div style={{ display: 'flex', gap: 2, opacity: 0, transition: 'opacity .15s' }} className="blk-ctrl">
-      <button onClick={() => move(i, -1)} disabled={i === 0} style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--ink3)', padding: '2px 4px', fontSize: '.72rem', borderRadius: 4 }}>↑</button>
-      <button onClick={() => move(i, 1)} disabled={i === blocks.length - 1} style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--ink3)', padding: '2px 4px', fontSize: '.72rem', borderRadius: 4 }}>↓</button>
-      <button onClick={() => del(i)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#C27054', padding: '2px 4px', fontSize: '.72rem', borderRadius: 4 }}>✕</button>
-    </div>
-  );
-
   const fmtBtn: React.CSSProperties = { border: 'none', background: 'none', cursor: 'pointer', color: 'var(--ink2)', padding: '4px 8px', borderRadius: 6, transition: 'background .15s', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 };
 
   return (
@@ -2916,6 +3343,18 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
             </div>
           );
         }
+        if (block.type === 'divider') {
+          return (
+            <div key={`${i}-divider`} className="img-blk" style={{ margin: '14px 0', position: 'relative', padding: '10px 0' }}>
+              <hr style={{ border: 'none', borderTop: '1.5px solid var(--line)', margin: 0 }} />
+              <div className="blk-ctrl" style={{ position: 'absolute', top: -8, right: 0, display: 'flex', gap: 4 }}>
+                <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); move(i, -1); }} disabled={i === 0} style={{ width: 22, height: 22, borderRadius: 6, border: 'none', background: 'var(--line)', color: 'var(--ink3)', cursor: 'pointer', fontSize: '.7rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>↑</button>
+                <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); move(i, 1); }} disabled={i === blocks.length - 1} style={{ width: 22, height: 22, borderRadius: 6, border: 'none', background: 'var(--line)', color: 'var(--ink3)', cursor: 'pointer', fontSize: '.7rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>↓</button>
+                <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); del(i); }} style={{ width: 22, height: 22, borderRadius: 6, border: 'none', background: 'rgba(180,60,40,.15)', color: '#C27054', cursor: 'pointer', fontSize: '.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Hapus garis">✕</button>
+              </div>
+            </div>
+          );
+        }
         if (block.type === 'todo') {
           return (
             <div key={`${i}-todo`} className="blk-wrap" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', borderBottom: '1px solid var(--line)' }}>
@@ -2923,7 +3362,7 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
                 {block.done && <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
               </button>
               <input ref={el => { refs.current[i] = el; }} value={block.content}
-                onFocus={() => setFocusedIdx(i)}
+                onFocus={() => setFocusedIdxBoth(i)}
                 onChange={e => { const nb = [...localBlocksRef.current]; nb[i] = { ...block, content: e.target.value }; emit(nb); }}
                 onKeyDown={e => {
                   if (e.key === 'Enter') { e.preventDefault(); const nb = [...localBlocksRef.current]; nb.splice(i + 1, 0, { type: 'todo', done: false, content: '' }); emit(nb); focusAt(i + 1); }
@@ -2931,7 +3370,7 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
                 }}
                 style={{ flex: 1, fontFamily: ff, fontSize: `${fz}rem`, lineHeight: 2.1, color: block.done ? 'var(--ink3)' : 'var(--ink)', textDecoration: block.done ? 'line-through' : 'none', border: 'none', outline: 'none', background: 'transparent', padding: 0 }}
               />
-              <BlockControls i={i} />
+              <BlockControls i={i} totalBlocks={blocks.length} onMove={move} onDel={del} />
             </div>
           );
         }
@@ -3027,8 +3466,8 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
             <div
               ref={el => {
                 refs.current[i] = el;
-                // Skip DOM reset only for the block being actively typed (debounce window)
-                const isTypingHere = i === focusedIdx && onChangeDebouncedRef.current !== null;
+                // Skip DOM reset only for the block being actively typed (debounce window + 500ms cooldown)
+                const isTypingHere = i === focusedIdxRef.current && (Date.now() - lastInputTimeRef.current < 500 || onChangeDebouncedRef.current !== null);
                 if (el && !isTypingHere) {
                   const content = block.content || '';
                   const prevLast = el.getAttribute('data-last');
@@ -3042,10 +3481,10 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
               contentEditable
               suppressContentEditableWarning
               data-placeholder={i === 0 ? placeholder : ''}
-              onFocus={() => { setFocusedIdx(i); syncFmt(); }}
-              onMouseUp={() => { syncFmt(); setTimeout(updateSelToolbar, 10); }}
+              onFocus={() => { setFocusedIdxBoth(i); syncFmt(); reportCursor(i); }}
+              onMouseUp={() => { syncFmt(); setTimeout(updateSelToolbar, 10); reportCursor(i); }}
               onKeyUp={e => {
-                syncFmt();
+                syncFmt(); reportCursor(i);
                 if (e.key.length !== 1 || e.shiftKey || e.ctrlKey || e.metaKey || e.altKey) updateSelToolbar();
                 const sel = window.getSelection();
                 if (sel && sel.rangeCount > 0) {
@@ -3115,6 +3554,101 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
               }}
               onSelect={() => { syncFmt(); updateSelToolbar(); }}
               onKeyDown={e => {
+                // Backspace start-of-block merge handling (Bug 5)
+                if (e.key === 'Backspace') {
+                  const sel = window.getSelection();
+                  if (sel && sel.rangeCount > 0) {
+                    const range = sel.getRangeAt(0);
+                    const el = refs.current[i] as HTMLDivElement;
+                    if (el) {
+                      let isAtStart = false;
+                      if (sel.isCollapsed && range.startContainer === el && range.startOffset === 0) {
+                        isAtStart = true;
+                      } else if (sel.isCollapsed) {
+                        const preRange = document.createRange();
+                        preRange.setStart(el, 0);
+                        preRange.setEnd(range.startContainer, range.startOffset);
+                        const textBefore = preRange.toString();
+                        if (textBefore.length === 0) {
+                          isAtStart = true;
+                        }
+                      }
+                      
+                      if (isAtStart) {
+                        if (i > 0) {
+                          const prevIdx = i - 1;
+                          const prevBlock = localBlocksRef.current[prevIdx];
+                          if (prevBlock.type === 'text') {
+                            e.preventDefault();
+                            const currentContent = el.innerHTML;
+                            const prevEl = refs.current[prevIdx] as HTMLDivElement;
+                            const prevContent = prevEl ? prevEl.innerHTML : prevBlock.content;
+                            const mergedHtml = prevContent + (currentContent && currentContent !== '<br>' ? currentContent : '');
+                            const nb = [...localBlocksRef.current];
+                            nb[prevIdx] = { type: 'text', content: mergedHtml };
+                            nb.splice(i, 1);
+                            clearDataLast();
+                            emit(nb);
+                            setTimeout(() => {
+                              const newPrevEl = refs.current[prevIdx] as HTMLDivElement;
+                              if (newPrevEl) {
+                                newPrevEl.focus();
+                                try {
+                                  const sel = window.getSelection();
+                                  if (sel) {
+                                    const range = document.createRange();
+                                    const prevTextLength = prevEl ? (prevEl.textContent || "").length : 0;
+                                    let offset = prevTextLength;
+                                    let targetNode: Node = newPrevEl;
+                                    let found = false;
+                                    const walker = document.createTreeWalker(newPrevEl, NodeFilter.SHOW_TEXT, null);
+                                    let node: Node | null;
+                                    while ((node = walker.nextNode())) {
+                                      const len = (node as Text).length;
+                                      if (offset <= len) {
+                                        targetNode = node;
+                                        found = true;
+                                        break;
+                                      }
+                                      offset -= len;
+                                    }
+                                    if (found) {
+                                      range.setStart(targetNode, offset);
+                                    } else {
+                                      range.selectNodeContents(newPrevEl);
+                                      range.collapse(false);
+                                    }
+                                    range.collapse(true);
+                                    sel.removeAllRanges();
+                                    sel.addRange(range);
+                                  }
+                                } catch (err) {}
+                              }
+                            }, 30);
+                            return;
+                          } else {
+                            const plainText = (el.textContent || "").trim();
+                            if (!plainText || plainText === "") {
+                              e.preventDefault();
+                              const nb = localBlocksRef.current.filter((_, j) => j !== i);
+                              emit(nb);
+                              setTimeout(() => {
+                                for (let k = i - 1; k >= 0; k--) {
+                                  if (localBlocksRef.current[k]?.type === 'text' || localBlocksRef.current[k]?.type === 'todo') {
+                                    focusAt(k);
+                                    break;
+                                  }
+                                }
+                              }, 30);
+                              return;
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+
                 // Alt+1/2/3/4 → Heading levels
                 if (e.altKey && !e.ctrlKey && !e.metaKey) {
                   if (e.key === '1') { e.preventDefault(); applyHeading(1); return; }
@@ -3228,7 +3762,14 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
                   return;
                 }
                 // 2. URL paste → link preview (check BEFORE html, using sync getData)
-                const plainText = e.clipboardData?.getData('text/plain') || '';
+                let plainText = e.clipboardData?.getData('text/plain') || '';
+                // Auto-format LaTeX delimiters \[...\] and \(...\) to standard $$...$$ and $...$ on clipboard paste
+                const originalPlain = plainText;
+                plainText = plainText
+                  .replace(/\\\[/g, '$$$$')
+                  .replace(/\\\]/g, '$$$$')
+                  .replace(/\\\(/g, '$$')
+                  .replace(/\\\)/g, '$$');
                 const trimmed = plainText.trim();
                 let isUrl = false;
                 try { const u = new URL(trimmed); isUrl = u.protocol === 'http:' || u.protocol === 'https:'; } catch(_) {}
@@ -3248,6 +3789,17 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
                   }
                   emit(nb3);
                   fetchLinkPreview(trimmed, nb3);
+                  return;
+                }
+
+                // If the pasted text contained LaTeX delimiters, and it is not a URL,
+                // and it doesn't look like markdown (which splits into blocks),
+                // we should intercept the paste event and insert the converted text directly.
+                const hasLatexDelimiters = originalPlain.includes('\\(') || originalPlain.includes('\\)') || originalPlain.includes('\\[') || originalPlain.includes('\\]');
+                if (hasLatexDelimiters && !quickLooksLikeMarkdown(plainText)) {
+                  e.preventDefault();
+                  document.execCommand('insertText', false, plainText);
+                  captureHtml(i);
                   return;
                 }
                 // 4. Markdown paste (processed asynchronously, with size guard)
@@ -3292,7 +3844,7 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
                   }, 0);
                   return;
                 }
-                // 5. HTML table paste (sync getData)
+                // 5. HTML paste (tables or general styled content)
                 const htmlContent = e.clipboardData?.getData('text/html') || '';
                 if (htmlContent) {
                   const div = document.createElement('div');
@@ -3316,13 +3868,59 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
                     }
                     return;
                   }
+
+                  // Intercept general HTML paste to sanitize external styling (Bug 11)
+                  e.preventDefault();
+                  const sanitized = sanitizeCeHtml(htmlContent);
+                  document.execCommand('insertHTML', false, sanitized);
+                  captureHtml(i);
+                  return;
                 }
               }}
               onInput={e => {
                 const el = e.currentTarget;
+                lastInputTimeRef.current = Date.now();
                 const html = sanitizeCeHtml(el.innerHTML);
                 el.setAttribute('data-last', html);
-                const nb = [...localBlocksRef.current]; nb[i] = { type: 'text', content: html }; emit(nb, true);
+                localBlocksRef.current[i] = { type: 'text', content: html };
+                emit(localBlocksRef.current, true);
+
+                // Mobile-friendly slash command detection (onKeyUp e.key==='/' is unreliable on virtual keyboards)
+                const sel = window.getSelection();
+                if (sel && sel.rangeCount > 0) {
+                  const range = sel.getRangeAt(0);
+                  const textBefore = range.startContainer.textContent?.slice(0, range.startOffset) || "";
+                  if (!slash.visible) {
+                    // Detect '/' at start of block or after a space
+                    const isTrigger = textBefore.trim() === '/' || textBefore.endsWith(' /');
+                    if (textBefore.endsWith('/') && isTrigger && editorRef.current) {
+                      const rect = range.getBoundingClientRect();
+                      const parentRect = editorRef.current.getBoundingClientRect();
+                      const spaceBelow = window.innerHeight - rect.bottom;
+                      const menuH = 280;
+                      const showAbove = spaceBelow < menuH;
+                      setSlash({
+                        visible: true,
+                        mode: 'command',
+                        query: '',
+                        selected: 0,
+                        idx: i,
+                        x: rect.left - parentRect.left,
+                        y: showAbove
+                          ? (rect.top - parentRect.top - menuH - 8)
+                          : (rect.bottom - parentRect.top + 4)
+                      });
+                    }
+                  } else {
+                    // Update query while slash menu is visible
+                    const lastSlashPos = textBefore.lastIndexOf('/');
+                    if (lastSlashPos !== -1) {
+                      setSlash(s => ({ ...s, query: textBefore.slice(lastSlashPos + 1) }));
+                    } else {
+                      setSlash(s => ({ ...s, visible: false }));
+                    }
+                  }
+                }
               }}
               onBlur={e => {
                 const plain = (e.currentTarget.textContent || '').trim();
@@ -3341,7 +3939,7 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
             />
             {blocks.length > 1 && (
               <div style={{ position: 'absolute', top: 6, right: 0, display: 'flex', gap: 2, alignItems: 'center' }}>
-                <BlockControls i={i} />
+                <BlockControls i={i} totalBlocks={blocks.length} onMove={move} onDel={del} />
               </div>
             )}
             {/* Insert media below this text block */}
@@ -3508,6 +4106,19 @@ const LiveEditor = memo(function LiveEditor({ entries, text, onChange, onUploadI
           </>
         );
       })(), document.body)}
+
+      {/* ── Remote cursor overlay (absolute inside position:relative editor div) ── */}
+      {Object.values(remoteCursors).map((c: any) => {
+        const key = c.userId ?? c.name;
+        const pos = computedCursorPositions[key];
+        if (!pos) return null;
+        return (
+          <div key={key} style={{ position: 'absolute', top: pos.y, left: pos.x, zIndex: 10, pointerEvents: 'none' }}>
+            <span style={{ position: 'absolute', bottom: '100%', left: 0, marginBottom: 2, background: c.color, color: '#fff', fontFamily: "'Lora',serif", fontSize: '.62rem', padding: '1px 6px', borderRadius: 6, fontWeight: 600, whiteSpace: 'nowrap' }}>{c.name}</span>
+            <div style={{ width: 2, height: pos.h, background: c.color, borderRadius: 1, animation: 'blink-cursor 1s step-end infinite' }} />
+          </div>
+        );
+      })}
     </div>
   );
 });
@@ -3792,11 +4403,20 @@ const linkZettel = (h: string) => {
 
 export default function DiaryApp() {
   const { data: session, status } = useSession();
+  const sessionUserIdRef = useRef<string|null>(null);
+  const sessionUserNameRef = useRef<string|null>(null);
+  const sessionUserImageRef = useRef<string|null>(null);
+  useEffect(() => {
+    sessionUserIdRef.current = (session?.user as any)?.id || null;
+    sessionUserNameRef.current = session?.user?.name || null;
+    sessionUserImageRef.current = session?.user?.image || null;
+  }, [session]);
   const today = new Date();
   const todayStr = fmtDate(today);
   const [entries, setEntries] = useState<Record<string, any>>({});
   const csrfRef = useRef<string>("");
   const [selId, setSelId] = useState<string | null>(null);
+  const deletedIdsRef = useRef<Set<string>>(new Set());
   const [view, setView] = useState("home");
   const [cM, setCM] = useState(today.getMonth());
   const [cY, setCY] = useState(today.getFullYear());
@@ -3810,6 +4430,19 @@ export default function DiaryApp() {
     setInfoToast(msg);
     infoToastTimerRef.current = setTimeout(() => setInfoToast(null), 3000);
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handleFcmNotification = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const { title, body } = customEvent.detail || {};
+      if (body) {
+        showInfoToast(`🔔 ${title}: ${body}`);
+      }
+    };
+    window.addEventListener("fcm-notification", handleFcmNotification);
+    return () => window.removeEventListener("fcm-notification", handleFcmNotification);
+  }, [showInfoToast]);
   const [loaded, setLoaded] = useState(false);
   const [q, setQ] = useState("");
   const [showSearch, setShowSearch] = useState(false);
@@ -3817,6 +4450,11 @@ export default function DiaryApp() {
   const [userResults, setUserResults] = useState<any[]>([]);
   const [userSearchLoading, setUserSearchLoading] = useState(false);
   const userSearchTimerRef = useRef<any>(null);
+  const [collabJoinPreview, setCollabJoinPreview] = useState<{noteId:string;title:string;ownerName:string;ownerImage:string|null;memberCount:number}|null>(null);
+  const [collabJoinLoading, setCollabJoinLoading] = useState(false);
+  const [collabJoinError, setCollabJoinError] = useState("");
+  const [collabJoining, setCollabJoining] = useState(false);
+  const collabJoinTimerRef = useRef<any>(null);
   const [activeTag, setActiveTag] = useState<string|null>(null);
   const [tagInput, setTagInput] = useState("");
   const [focusMode, setFocusMode] = useState(false);
@@ -3907,6 +4545,31 @@ export default function DiaryApp() {
   const [selectedExportIndices, setSelectedExportIndices] = useState<Set<number>>(new Set());
   const [exportData, setExportData] = useState<any[]>([]);
 
+  // ── Collab state ──
+  const [collabMembers, setCollabMembers] = useState<any[]>([]);
+  const [showCollabPanel, setShowCollabPanel] = useState(false);
+  const [collabInviteCode, setCollabInviteCode] = useState<string|null>(null);
+  const [collabEnabled, setCollabEnabled] = useState(false);
+  const [collabLoading, setCollabLoading] = useState(false);
+  const [collabCopied, setCollabCopied] = useState(false);
+  const [isCollabOwner, setIsCollabOwner] = useState(false);
+  const [collabPaused, setCollabPaused] = useState(false);
+  const [collabPopup, setCollabPopup] = useState<"kicked"|"banned"|"closed"|"paused"|null>(null);
+  const ydocRef = useRef<Y.Doc|null>(null);
+  const webrtcProviderRef = useRef<any>(null);
+  const ytextRef = useRef<Y.Text|null>(null);
+  const isApplyingYjsRef = useRef(false);
+  const prevYjsTextRef = useRef("");
+  const yjsSendTimerRef = useRef<any>(null);
+
+  const dbPersistTimerRef = useRef<any>(null);
+  const lastPersistedTextRef = useRef("");
+  const collabNoteIdRef = useRef<string|null>(null);
+  // Local cursor position to broadcast to collaborators
+  const localCursorRef = useRef<{blockIndex:number;charOffset:number}|null>(null);
+  // Remote cursors: userId → {blockIndex, offset, name, color}
+  const [remoteCursors, setRemoteCursors] = useState<Record<string,any>>({});
+
   const syncCloud = useCallback(async (n: Record<string, any>, updatedNote?: any, force = false) => {
     if (!updatedNote) return;
     const { id } = updatedNote;
@@ -3988,7 +4651,7 @@ export default function DiaryApp() {
     lsWriteTimerRef2.current = setTimeout(() => { localStorage.setItem("catatanku_entries", JSON.stringify(e)); lsWriteTimerRef2.current = null; }, 800);
   }, []);
 
-  const nav = useCallback((v: string, id?: any) => {
+  const nav = useCallback((v: string, id?: any, pushHistoryState = true) => {
     if ((v === "read" || v === "write") && id && entriesRef.current[id]?.isLocked && !unlockedIds.includes(id)) {
       setPendingNav({ v, id });
       setShowUnlock(true);
@@ -4000,9 +4663,18 @@ export default function DiaryApp() {
     if (view === "write" && selId && entriesRef.current[selId]) {
       syncCloud(entriesRef.current, entriesRef.current[selId], true);
     }
+    if (pushHistoryState && typeof window !== "undefined") {
+      const params = new URLSearchParams();
+      if (v && v !== "home") params.set("view", v);
+      if (id) params.set("noteId", id);
+      const search = params.toString();
+      const url = search ? `?${search}` : window.location.pathname;
+      window.history.pushState({ view: v, noteId: id || null }, "", url);
+    }
     setAnim("pg-out");
     setTimeout(() => {
       if (id !== undefined) setSelId(id);
+      else if (v === "home") setSelId(null);
       setView(v); setShowSearch(false); setQ(""); setShowStickers(false);
       setAnim("pg-in");
       window.scrollTo({ top: 0, behavior: "instant" as any });
@@ -4294,7 +4966,55 @@ export default function DiaryApp() {
     }
   }, [status]);
 
+  // Handle initial URL routing on page load (Browser Back/Forward integration)
+  useEffect(() => {
+    if (loaded) {
+      const params = new URLSearchParams(window.location.search);
+      const initialView = params.get("view");
+      const initialNoteId = params.get("noteId");
+      if (initialView || initialNoteId) {
+        const targetView = initialView || (initialNoteId ? "read" : "home");
+        nav(targetView, initialNoteId || null, false);
+        window.history.replaceState({ view: targetView, noteId: initialNoteId || null }, "", window.location.search);
+      } else {
+        window.history.replaceState({ view: "home", noteId: null }, "", "");
+      }
+    }
+  }, [loaded]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Redirect to home if view is read/write but the selected note doesn't exist
+  useEffect(() => {
+    if (loaded && (view === "read" || view === "write") && selId) {
+      if (!entries[selId]) {
+        nav("home");
+        if (deletedIdsRef.current.has(selId)) {
+          deletedIdsRef.current.delete(selId);
+          showInfoToast("Catatan berhasil dihapus.");
+        } else {
+          showInfoToast("Catatan tidak ditemukan.");
+        }
+      }
+    }
+  }, [loaded, view, selId, entries, nav, showInfoToast]);
+
+  // Listen to browser back/forward buttons (Browser Back/Forward integration)
+  useEffect(() => {
+    const handlePopState = (e: PopStateEvent) => {
+      let targetView = "home";
+      let targetNoteId: string | null = null;
+      if (e.state && typeof e.state === "object") {
+        targetView = e.state.view || "home";
+        targetNoteId = e.state.noteId || null;
+      } else {
+        const params = new URLSearchParams(window.location.search);
+        targetView = params.get("view") || "home";
+        targetNoteId = params.get("noteId");
+      }
+      nav(targetView, targetNoteId, false);
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [nav]);
 
   const newEntry = useCallback((date: string) => {
     const id = uid();
@@ -4303,33 +5023,383 @@ export default function DiaryApp() {
     const defShareMusic = localStorage.getItem("catatanku_def_sharemusic") !== "false";
     const fresh = { id, date, title:"", text:"", mood:null, stickers:[], ts: Date.now(), isPinned: false, color: defColor, theme: '', shareId: null, isOneTime: false, songId: '', songTitle: '', songArtwork: '', songPreview: '', shareMusic: defShareMusic, font: defFont };
     const nextEntries = { ...entriesRef.current, [id]: fresh };
+    entriesRef.current = nextEntries;
     setEntries(nextEntries);
     lsFlush(nextEntries);
     lastSavedWordsRef.current = 0;
+
     nav("write", id);
   }, [nav, lsFlush]);
+
+  // ── Collab helpers ──
+  const CURSOR_COLORS = ["#e74c3c","#3498db","#2ecc71","#f39c12","#9b59b6","#1abc9c","#e67e22","#e91e63"];
+
+  // Broadcast local text + cursor via Y.Map and WebRTC awareness (P2P debounced)
+  const broadcastSync = useCallback((noteId: string) => {
+    const text = entriesRef.current[noteId]?.text || "";
+    const cursor = localCursorRef.current;
+    
+    // 1. Text is synced via Y.Map for deterministic conflict resolution (no bouncing)
+    if (ydocRef.current && !isApplyingYjsRef.current) {
+      ydocRef.current.getMap('state').set('text', text);
+    }
+
+    // 2. Cursor is synced via awareness because it's high frequency and ephemeral
+    if (webrtcProviderRef.current) {
+      webrtcProviderRef.current.awareness.setLocalStateField("sync", {
+        userId: sessionUserIdRef.current,
+        name: sessionUserNameRef.current || "Anon",
+        cursor,
+      });
+    }
+  }, []);
+
+  const scheduleBroadcast = useCallback((noteId: string) => {
+    if (yjsSendTimerRef.current) clearTimeout(yjsSendTimerRef.current);
+    yjsSendTimerRef.current = setTimeout(() => broadcastSync(noteId), 200);
+  }, [broadcastSync]);
+
+  const startCollabChannel = useCallback((noteId: string, initialMembers: any[] = []) => {
+    // Clean up any existing channel
+    if (dbPersistTimerRef.current) { clearInterval(dbPersistTimerRef.current); dbPersistTimerRef.current = null; }
+    collabNoteIdRef.current = noteId;
+
+    // Seed remoteCursors from existing members so colors are stable
+    const colorMap: Record<string, string> = {};
+    initialMembers.forEach((m: any, i: number) => { colorMap[m.userId] = CURSOR_COLORS[i % CURSOR_COLORS.length]; });
+
+    // WebRTC Peer-to-Peer setup for typing, cursors, and control events
+    if (ydocRef.current) { ydocRef.current.destroy(); }
+    if (webrtcProviderRef.current) { webrtcProviderRef.current.destroy(); }
+    
+    const ydoc = new Y.Doc();
+    ydocRef.current = ydoc;
+    
+    const provider = new WebrtcProvider(`catatanku-collab-${noteId}`, ydoc, {
+      signaling: ['ws://localhost:4444']
+    });
+    webrtcProviderRef.current = provider;
+
+    // Observe text and control states in Y.Map (Resolves bouncing deterministically)
+    ydoc.getMap('state').observe(event => {
+      if (collabNoteIdRef.current !== noteId) return;
+
+      if (event.keysChanged.has('text')) {
+        const text = ydoc.getMap('state').get('text') as string;
+        if (text !== undefined && text !== prevYjsTextRef.current) {
+          isApplyingYjsRef.current = true;
+          prevYjsTextRef.current = text;
+          const nid = collabNoteIdRef.current;
+          if (nid && entriesRef.current[nid]) {
+            setEntries(prev => ({ ...prev, [nid]: { ...prev[nid], text } }));
+          }
+          setTimeout(() => { isApplyingYjsRef.current = false; }, 0);
+        }
+      }
+
+      if (event.keysChanged.has('paused')) {
+        const paused = ydoc.getMap('state').get('paused') as boolean;
+        setCollabPaused(paused);
+        setCollabPopup(paused ? "paused" : null);
+      }
+
+      if (event.keysChanged.has('closed')) {
+        const closed = ydoc.getMap('state').get('closed') as boolean;
+        if (closed) {
+          stopCollabChannel();
+          setCollabPopup("closed");
+        }
+      }
+    });
+
+    // Observe kick and ban events in Y.Array
+    ydoc.getArray('kicked').observe(() => {
+      const kicked = ydoc.getArray('kicked').toArray();
+      if (kicked.includes(sessionUserIdRef.current)) {
+        stopCollabChannel();
+        setCollabPopup("kicked");
+      }
+    });
+
+    ydoc.getArray('banned').observe(() => {
+      const banned = ydoc.getArray('banned').toArray();
+      if (banned.includes(sessionUserIdRef.current)) {
+        stopCollabChannel();
+        setCollabPopup("banned");
+      }
+    });
+
+    // Awareness for remote cursors and presence
+    provider.awareness.on("change", () => {
+      if (collabNoteIdRef.current !== noteId) return;
+      
+      let activeSenderIds = new Set<string>();
+      
+      provider.awareness.getStates().forEach((state: any, clientID: number) => {
+        if (clientID === provider.awareness.clientID) return; // Skip self (this tab)
+        if (!state.sync) return;
+        
+        const { userId: senderId, name: senderName, cursor } = state.sync;
+        
+        if (senderId) {
+          activeSenderIds.add(senderId);
+
+          if (cursor !== undefined) {
+            setRemoteCursors(prev => {
+              const color = colorMap[senderId] || CURSOR_COLORS[0];
+              const name = senderName || prev[senderId]?.name || initialMembers.find((m: any) => m.userId === senderId)?.name || "Anon";
+              return { ...prev, [senderId]: { ...cursor, name, color, userId: senderId } };
+            });
+          }
+        }
+      });
+      
+      // Clean up cursors for disconnected peers and update online presence
+      setRemoteCursors(prev => {
+        const next = { ...prev };
+        let changed = false;
+        Object.keys(next).forEach(id => {
+          if (!activeSenderIds.has(id)) {
+            delete next[id];
+            changed = true;
+          }
+        });
+        return changed ? next : prev;
+      });
+
+      // Update online status in collab panel based on P2P awareness (always online locally)
+      setCollabMembers(prev => {
+        let changed = false;
+        const next = prev.map(m => {
+          const isOnline = activeSenderIds.has(m.userId) || m.userId === sessionUserIdRef.current;
+          if (m.online !== isOnline) changed = true;
+          return { ...m, online: isOnline };
+        });
+        return changed ? next : prev;
+      });
+    });
+
+
+    // Persist to DB every 5s so late joiners get a snapshot (not for broadcasting)
+    dbPersistTimerRef.current = setInterval(() => {
+      const nid = collabNoteIdRef.current;
+      if (!nid) return;
+      const text = entriesRef.current[nid]?.text || "";
+      if (text === lastPersistedTextRef.current) return;
+      lastPersistedTextRef.current = text;
+      fetch(`/api/notes/${nid}/yjs`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      }).catch(() => {});
+    }, 5000);
+  }, [broadcastSync]); // eslint-disable-line
+
+  const stopCollabChannel = useCallback(() => {
+    if (yjsSendTimerRef.current) { clearTimeout(yjsSendTimerRef.current); yjsSendTimerRef.current = null; }
+    if (dbPersistTimerRef.current) { clearInterval(dbPersistTimerRef.current); dbPersistTimerRef.current = null; }
+
+    if (webrtcProviderRef.current) { webrtcProviderRef.current.destroy(); webrtcProviderRef.current = null; }
+    if (ydocRef.current) { ydocRef.current.destroy(); ydocRef.current = null; }
+    collabNoteIdRef.current = null;
+    lastPersistedTextRef.current = "";
+    prevYjsTextRef.current = "";
+    ytextRef.current = null;
+    setCollabMembers([]);
+    setRemoteCursors({});
+    setCollabEnabled(false);
+    setCollabInviteCode(null);
+    setIsCollabOwner(false);
+    setCollabPaused(false);
+  }, []);
+
+  const loadCollabPanel = useCallback(async (noteId: string) => {
+    setCollabLoading(true);
+    try {
+      const r = await fetch(`/api/notes/${noteId}/collab`);
+      if (!r.ok) { setCollabLoading(false); return; }
+      const d = await r.json();
+      setCollabInviteCode(d.inviteCode);
+      setCollabMembers(d.members || []);
+      setIsCollabOwner(!!d.isOwner);
+      setCollabPaused(!!d.collabPaused);
+      if (d.inviteCode && collabNoteIdRef.current !== noteId) {
+        setCollabEnabled(true);
+        prevYjsTextRef.current = entriesRef.current[noteId]?.text || "";
+        startCollabChannel(noteId, d.members || []);
+      }
+    } catch {} finally { setCollabLoading(false); }
+  }, [startCollabChannel]);
+
+  const enableCollab = useCallback(async (noteId: string) => {
+    setCollabLoading(true);
+    try {
+      const r = await fetch(`/api/notes/${noteId}/collab`, { method: "POST" });
+      if (!r.ok) return;
+      const d = await r.json();
+      setCollabInviteCode(d.inviteCode);
+      setCollabEnabled(true);
+      setIsCollabOwner(true);
+      prevYjsTextRef.current = entriesRef.current[noteId]?.text || "";
+      startCollabChannel(noteId, []);
+      loadCollabPanel(noteId);
+    } catch {} finally { setCollabLoading(false); }
+  }, [startCollabChannel, loadCollabPanel]);
+
+  const disableCollab = useCallback(async (noteId: string) => {
+    setCollabLoading(true);
+    try {
+      if (ydocRef.current) {
+        ydocRef.current.getMap('state').set('closed', true);
+      }
+      await fetch(`/api/notes/${noteId}/collab`, { method: "DELETE" });
+      stopCollabChannel();
+      setShowCollabPanel(false);
+    } catch {} finally { setCollabLoading(false); }
+  }, [stopCollabChannel]);
+
+  const togglePauseCollab = useCallback(async (noteId: string, pause: boolean) => {
+    try {
+      await fetch(`/api/notes/${noteId}/collab`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ paused: pause }) });
+      if (ydocRef.current) {
+        ydocRef.current.getMap('state').set('paused', pause);
+      }
+      setCollabPaused(pause);
+    } catch {}
+  }, []);
+
+  const banMember = useCallback(async (noteId: string, targetUserId: string) => {
+    try {
+      if (ydocRef.current) {
+        ydocRef.current.getArray('banned').push([targetUserId]);
+      }
+      await fetch(`/api/notes/${noteId}/collab/members/${targetUserId}`, { method: "PATCH" });
+      setCollabMembers(prev => prev.map((m: any) => m.userId === targetUserId ? { ...m, isBanned: true } : m));
+    } catch {}
+  }, []);
+
+  const joinCollabFromSearch = useCallback(async (code: string) => {
+    setCollabJoining(true);
+    try {
+      const r = await fetch(`/api/collab/join/${code}`, { method: "POST" });
+      if (!r.ok) {
+        const err = await r.json().catch(() => ({}));
+        setCollabJoinError(err?.error === "Banned" ? "Kamu telah dibanned dari catatan ini." : "Gagal bergabung. Coba lagi.");
+        setCollabJoining(false);
+        return;
+      }
+      const d = await r.json();
+      // Wait for 1s to allow server to persist the member before starting P2P
+      await new Promise(r => setTimeout(r, 1000));
+      // Clear search and navigate into the note in collab mode
+      setQ("");
+      setShowSearch(false);
+      setCollabJoinPreview(null);
+      // Load the note then start collab channel
+      let resolvedId = d.noteId;
+      if (!entriesRef.current[resolvedId]) {
+        try {
+          const nr = await fetch(`/api/notes/${resolvedId}`);
+          if (nr.ok) { const note = await nr.json(); if (note?.id) { setEntries(prev => ({ ...prev, [note.id]: note })); } }
+        } catch {}
+      }
+      nav("write", resolvedId);
+      try {
+        const cr = await fetch(`/api/notes/${resolvedId}/collab`);
+        if (cr.ok) {
+          const cd = await cr.json();
+          if (cd.inviteCode) {
+            setCollabInviteCode(cd.inviteCode);
+            setCollabMembers(cd.members || []);
+            setCollabEnabled(true);
+            setCollabPaused(!!cd.collabPaused);
+            prevYjsTextRef.current = entriesRef.current[resolvedId]?.text || "";
+            startCollabChannel(resolvedId, cd.members || []);
+            // Fetch latest snapshot
+            fetch(`/api/notes/${resolvedId}/yjs`).then(r2 => r2.ok ? r2.json() : null).then(snap => {
+              if (snap?.text && snap.text !== entriesRef.current[resolvedId]?.text) {
+                setEntries(prev => ({ ...prev, [resolvedId]: { ...prev[resolvedId], text: snap.text } }));
+                prevYjsTextRef.current = snap.text;
+              }
+            }).catch(() => {});
+          }
+        }
+      } catch {}
+    } catch {
+      setCollabJoinError("Gagal bergabung. Coba lagi.");
+    }
+    setCollabJoining(false);
+  }, [nav, startCollabChannel]);
+
+  // Handle ?note=<id>&view=<write|read> deep-link (used by collab join redirect)
+  // Placed AFTER collab helpers so they're in scope
+  useEffect(() => {
+    if (!loaded || typeof window === "undefined") return;
+    const sp = new URLSearchParams(window.location.search);
+    const noteId = sp.get("note");
+    const targetView = sp.get("view");
+    if (!noteId || !targetView) return;
+    window.history.replaceState({}, "", window.location.pathname);
+    setTimeout(async () => {
+      let resolvedId = noteId;
+      if (!entriesRef.current[noteId]) {
+        try {
+          const nr = await fetch(`/api/notes/${noteId}`);
+          if (nr.ok) {
+            const note = await nr.json();
+            if (note?.id) { setEntries(prev => ({ ...prev, [note.id]: note })); resolvedId = note.id; }
+          }
+        } catch {}
+      }
+      nav(targetView, resolvedId);
+      // Auto-start collab poll
+      try {
+        const cr = await fetch(`/api/notes/${resolvedId}/collab`);
+        if (cr.ok) {
+          const cd = await cr.json();
+          if (cd.inviteCode) {
+            setCollabInviteCode(cd.inviteCode);
+            setCollabMembers(cd.members || []);
+            setCollabEnabled(true);
+            prevYjsTextRef.current = entriesRef.current[resolvedId]?.text || "";
+            startCollabChannel(resolvedId, cd.members || []);
+          }
+        }
+      } catch {}
+    }, 100);
+  }, [loaded, nav, startCollabChannel]);
 
   const entry = selId ? (entries[selId] || null) : null;
   const upd = useCallback((f: string, v: any) => {
     if (!selId) return;
-    const updatedNote = { ...entriesRef.current[selId], [f]: v, ts: Date.now() };
-    const nextEntries = { ...entriesRef.current, [selId]: updatedNote };
+    const currentEntries = entriesRef.current;
+    const updatedNote = { ...currentEntries[selId], [f]: v, ts: Date.now() };
+    const nextEntries = { ...currentEntries, [selId]: updatedNote };
+    
+    // Update ref immediately so subsequent calls in the same tick see this update
+    entriesRef.current = nextEntries;
     setEntries(nextEntries);
-    // Debounce LS for text/title (typed every keystroke); flush immediately for other fields
+
     if (f === "text" || f === "title") lsSchedule(nextEntries);
     else lsFlush(nextEntries);
+    
     const isImmediate = f !== "text" && f !== "title";
     syncCloud(nextEntries, updatedNote, isImmediate);
   }, [selId, syncCloud, lsSchedule, lsFlush]);
 
+
   const updMany = useCallback((fields: Record<string, any>) => {
     if (!selId) return;
-    const updatedNote = { ...entriesRef.current[selId], ...fields, ts: Date.now() };
-    const nextEntries = { ...entriesRef.current, [selId]: updatedNote };
+    const currentEntries = entriesRef.current;
+    const updatedNote = { ...currentEntries[selId], ...fields, ts: Date.now() };
+    const nextEntries = { ...currentEntries, [selId]: updatedNote };
+    
+    entriesRef.current = nextEntries;
     setEntries(nextEntries);
     lsFlush(nextEntries);
     syncCloud(nextEntries, updatedNote, true);
   }, [selId, syncCloud, lsFlush]);
+
   const addYouTubeSong = useCallback(async (url: string) => {
     setYtLoading(true); setYtError(""); setYtPreview(null);
     try {
@@ -4354,6 +5424,7 @@ export default function DiaryApp() {
 
   const doDelete = useCallback(async (id: string) => {
     if (saveTimeoutRef.current) { clearTimeout(saveTimeoutRef.current); saveTimeoutRef.current = null; }
+    deletedIdsRef.current.add(id);
     const nextEntries = { ...entriesRef.current }; delete nextEntries[id];
     setEntries(nextEntries);
     lsFlush(nextEntries);
@@ -4365,10 +5436,15 @@ export default function DiaryApp() {
       const sr = await fetch(`/api/streak?today=${todayStr}`);
       if (sr.ok) { const sd = await sr.json(); setStreak(sd); setDisplayedStreak(sd.currentStreak); prevStreakRef.current = sd.currentStreak; }
     } catch(e) {}
-    if (id === selId) nav("home");
-  }, [todayStr, selId, nav, lsFlush]);
+    if (id === selId) {
+      nav("home");
+    } else {
+      showInfoToast("Catatan berhasil dihapus.");
+    }
+  }, [todayStr, selId, nav, lsFlush, showInfoToast]);
 
   const doDeleteMany = useCallback(async (ids: string[]) => {
+    ids.forEach(id => deletedIdsRef.current.add(id));
     const nextEntries = { ...entriesRef.current };
     ids.forEach(id => delete nextEntries[id]);
     setEntries(nextEntries);
@@ -4376,11 +5452,12 @@ export default function DiaryApp() {
     await Promise.all(ids.map(id => fetch(`/api/notes?id=${id}`, { method: "DELETE", headers: { "X-CSRF-Token": csrfRef.current } }).catch(() => {})));
     setSelectedIds(new Set());
     setSelectMode(false);
+    showInfoToast(`${ids.length} catatan berhasil dihapus.`);
     try {
       const sr = await fetch(`/api/streak?today=${todayStr}`);
       if (sr.ok) { const sd = await sr.json(); setStreak(sd); setDisplayedStreak(sd.currentStreak); prevStreakRef.current = sd.currentStreak; }
     } catch(e) {}
-  }, [todayStr, lsFlush]);
+  }, [todayStr, lsFlush, showInfoToast]);
 
   const duplicateNote = useCallback(async (e: any) => {
     if (e.isLocked) return;
@@ -4551,6 +5628,51 @@ export default function DiaryApp() {
   // Exit focus mode when leaving write view
   useEffect(() => { if (view !== "write" && view !== "read") setFocusModeWrapper(false); }, [view, setFocusModeWrapper]);
 
+  // Collab: broadcast local text changes via Supabase (debounced 200ms)
+  useEffect(() => {
+    if (!collabEnabled || !selId) return;
+    if (isApplyingYjsRef.current) return;
+    const currentText = entry?.text || "";
+    if (currentText === prevYjsTextRef.current) return;
+    prevYjsTextRef.current = currentText;
+    scheduleBroadcast(selId);
+  }, [entry?.text, collabEnabled, selId, scheduleBroadcast]);
+
+  // Collab: stop channel when leaving note view
+  useEffect(() => {
+    if (!collabEnabled) return;
+    if (view !== "write" && view !== "read") stopCollabChannel();
+  }, [view, collabEnabled, stopCollabChannel]);
+
+  // Collab: auto-detect and start channel when entering write/read view for a note
+  useEffect(() => {
+    if ((view !== "write" && view !== "read") || !selId || !loaded) return;
+    if (collabNoteIdRef.current === selId) return;
+    fetch(`/api/notes/${selId}/collab`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (!d?.inviteCode) return;
+        setCollabInviteCode(d.inviteCode);
+        setCollabMembers(d.members || []);
+        setCollabEnabled(true);
+        setIsCollabOwner(!!d.isOwner);
+        setCollabPaused(!!d.collabPaused);
+        prevYjsTextRef.current = entriesRef.current[selId]?.text || "";
+        startCollabChannel(selId, d.members || []);
+        // Fetch persisted snapshot for late joiners
+        fetch(`/api/notes/${selId}/yjs`)
+          .then(r => r.ok ? r.json() : null)
+          .then(snap => {
+            if (!snap?.text || snap.text === prevYjsTextRef.current) return;
+            isApplyingYjsRef.current = true;
+            prevYjsTextRef.current = snap.text;
+            setEntries(prev => ({ ...prev, [selId]: { ...prev[selId], text: snap.text } }));
+            setTimeout(() => { isApplyingYjsRef.current = false; }, 0);
+          }).catch(() => {});
+      })
+      .catch(() => {});
+  }, [view, selId, loaded, startCollabChannel]);
+
   // User search — debounce 350ms when q starts with @
   useEffect(() => {
     const term = q.startsWith("@") ? q.slice(1).trim() : "";
@@ -4565,6 +5687,37 @@ export default function DiaryApp() {
       setUserSearchLoading(false);
     }, 350);
     return () => clearTimeout(userSearchTimerRef.current);
+  }, [q]);
+
+  // Extract invite code from raw query (code or full URL)
+  const extractCollabCode = (raw: string): string | null => {
+    const trimmed = raw.trim();
+    // Full URL: extract last path segment
+    const urlMatch = trimmed.match(/\/collab\/join\/([A-Z0-9]{8,20})/i);
+    if (urlMatch) return urlMatch[1].toUpperCase();
+    // Bare code: uppercase alphanumeric, 8-20 chars, no spaces
+    if (/^[A-Z0-9]{8,20}$/i.test(trimmed)) return trimmed.toUpperCase();
+    return null;
+  };
+
+  // Auto-fetch collab preview when search looks like a collab code/URL
+  useEffect(() => {
+    if (q.startsWith("@")) { setCollabJoinPreview(null); setCollabJoinError(""); return; }
+    const code = extractCollabCode(q);
+    if (!code) { setCollabJoinPreview(null); setCollabJoinError(""); return; }
+    setCollabJoinPreview(null);
+    setCollabJoinError("");
+    setCollabJoinLoading(true);
+    clearTimeout(collabJoinTimerRef.current);
+    collabJoinTimerRef.current = setTimeout(async () => {
+      try {
+        const r = await fetch(`/api/collab/join/${code}`);
+        if (r.ok) { setCollabJoinPreview(await r.json()); }
+        else { setCollabJoinError("Kode undangan tidak ditemukan."); }
+      } catch { setCollabJoinError("Gagal memuat. Coba lagi."); }
+      setCollabJoinLoading(false);
+    }, 400);
+    return () => clearTimeout(collabJoinTimerRef.current);
   }, [q]);
 
   const allSorted = useMemo(() => Object.values(entries).filter((e: any)=>hasContent(e)).sort((a: any, b: any)=>{
@@ -4686,7 +5839,7 @@ export default function DiaryApp() {
       setCompanionMsgIdx(i => i + 1);
       setShowCompanionChat(true);
     }, 90000);
-    return () => clearInterval(iv);
+    return () => clearTimeout(iv);
   }, [companionType]);
 
   // GPS capture: grab location once per note per session when entering write view
@@ -5058,6 +6211,14 @@ export default function DiaryApp() {
   useEffect(() => {
     if (!session?.user) return;
     if (typeof Notification === "undefined") return;
+
+    // Always register foreground listener early if permission was already granted
+    if (Notification.permission === "granted") {
+      import("@/lib/firebase-client").then(({ setupForegroundListener }) => {
+        setupForegroundListener();
+      });
+    }
+
     if (Notification.permission !== "default") {
       // Already decided — if granted, just refresh token silently
       if (Notification.permission === "granted") {
@@ -5187,6 +6348,38 @@ export default function DiaryApp() {
         "--shadow":"0 2px 20px rgba(45,18,8,0.06)",
         "--scroll-thumb":"#E8541A","--scroll-track":"#FAD5C0","--scroll-thumb-hover":"#C43E08",
         "--surface2":"rgba(0,0,0,0.06)",
+      },
+      matcha: {
+        "--bg":"#F4F7F4","--surface":"#FFFFFF","--header-bg":"rgba(244,247,244,0.94)",
+        "--ink":"#1A2E1E","--ink2":"#4C7C54","--ink3":"#98B8A0",
+        "--accent":"#4C7C54","--accent-soft":"#C7DFC9","--line":"#DCEAE0",
+        "--shadow":"0 2px 20px rgba(26,46,30,0.05)",
+        "--scroll-thumb":"#4C7C54","--scroll-track":"#C7DFC9","--scroll-thumb-hover":"#3C6343",
+        "--surface2":"rgba(0,0,0,0.06)",
+      },
+      sunset: {
+        "--bg":"#FFF5ED","--surface":"#FFFFFF","--header-bg":"rgba(255,245,237,0.94)",
+        "--ink":"#3D1A10","--ink2":"#8A5A4A","--ink3":"#C8A090",
+        "--accent":"#E07A5F","--accent-soft":"#F4D1C6","--line":"#F6E4DA",
+        "--shadow":"0 2px 20px rgba(61,26,16,0.06)",
+        "--scroll-thumb":"#E07A5F","--scroll-track":"#F4D1C6","--scroll-thumb-hover":"#C5654A",
+        "--surface2":"rgba(0,0,0,0.06)",
+      },
+      cyberpunk: {
+        "--bg":"#0D0E15","--surface":"#151622","--header-bg":"rgba(21,22,34,0.96)",
+        "--ink":"#00FFFF","--ink2":"#FF007F","--ink3":"#A000A8",
+        "--accent":"#FF007F","--accent-soft":"rgba(255,0,127,0.15)","--line":"#2A2C3F",
+        "--shadow":"0 2px 24px rgba(255,0,127,0.25)",
+        "--scroll-thumb":"#FF007F","--scroll-track":"#2A2C3F","--scroll-thumb-hover":"#E0006F",
+        "--surface2":"rgba(255,255,255,0.08)",
+      },
+      glass: {
+        "--bg":"#0E1525","--surface":"rgba(255, 255, 255, 0.035)","--header-bg":"rgba(14, 21, 37, 0.7)",
+        "--ink":"#F3F4F6","--ink2":"#9CA3AF","--ink3":"#4B5563",
+        "--accent":"#8B5CF6","--accent-soft":"rgba(139, 92, 246, 0.15)","--line":"rgba(255, 255, 255, 0.08)",
+        "--shadow":"0 8px 32px 0 rgba(0, 0, 0, 0.37)",
+        "--scroll-thumb":"#8B5CF6","--scroll-track":"rgba(255, 255, 255, 0.05)","--scroll-thumb-hover":"#7C3AED",
+        "--surface2":"rgba(255, 255, 255, 0.05)",
       },
     };
     const DEFAULT_VARS: Record<string, string> = {
@@ -5751,7 +6944,7 @@ export default function DiaryApp() {
         .s1{animation:fadeUp .5s ease .04s both}.s2{animation:fadeUp .5s ease .1s both}.s3{animation:fadeUp .5s ease .18s both}.s4{animation:fadeUp .5s ease .27s both}.s5{animation:fadeUp .5s ease .36s both}
         .gb{background:none;border:none;cursor:pointer;color:var(--ink2);font-family:'Lora',serif;font-size:.86rem;transition:color .2s;display:inline-flex;align-items:center;gap:6px}
         .gb:hover{color:var(--ink)}
-        .ecard{padding:18px 22px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--line);cursor:pointer;transition:transform .25s cubic-bezier(.23,1,.32,1),box-shadow .25s cubic-bezier(.23,1,.32,1),border-color .2s ease;position:relative;overflow:hidden;content-visibility:auto;contain-intrinsic-size:0 120px}
+        .ecard{padding:18px 22px;border-radius:var(--radius);background:var(--surface);backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);border:1px solid var(--line);cursor:pointer;transition:transform .25s cubic-bezier(.23,1,.32,1),box-shadow .25s cubic-bezier(.23,1,.32,1),border-color .2s ease;position:relative;overflow:hidden;content-visibility:auto;contain-intrinsic-size:0 120px}
         .ecard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--card-accent,var(--accent-soft));border-radius:var(--radius) 0 0 var(--radius);transition:width .25s ease}
         .ecard:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(46,37,32,.08);border-color:var(--card-border,var(--accent-soft))}
         .ecard:hover::before{width:5px}
@@ -5841,7 +7034,7 @@ export default function DiaryApp() {
         .mob-only{display:flex!important}
         @media(min-width:768px){.mob-only{display:none!important}}
         /* ── Mobile bottom nav ─── */
-        .mob-nav{position:fixed;bottom:0;left:0;right:0;height:66px;background:var(--surface);border-top:1px solid var(--line);z-index:200;display:flex;align-items:stretch;padding-bottom:env(safe-area-inset-bottom,0px);will-change:transform;contain:layout style}
+        .mob-nav{position:fixed;bottom:0;left:0;right:0;height:66px;background:var(--surface);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--line);z-index:200;display:flex;align-items:stretch;padding-bottom:env(safe-area-inset-bottom,0px);will-change:transform;contain:layout style}
         @media(min-width:768px){.mob-nav{display:none}}
         .mob-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:none;cursor:pointer;padding:8px 2px;color:var(--ink3);transition:color .15s;-webkit-tap-highlight-color:transparent}
         .mob-nav-btn.act{color:var(--accent)}
@@ -6169,6 +7362,107 @@ export default function DiaryApp() {
         <DownloadModal onTxt={() => exportNote(entry)} onPdf={exportPDF} onCancel={() => setShowDownloadModal(false)} />
       )}
 
+      {/* ── Collab Session Ended Popup ── */}
+      {collabPopup && (
+        <div style={{position:"fixed",inset:0,zIndex:5000,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,.5)",backdropFilter:"blur(4px)"}}>
+          <div style={{background:"var(--surface,#fff)",borderRadius:20,padding:"32px 28px",width:"min(360px,88vw)",boxShadow:"0 8px 40px rgba(0,0,0,.22)",border:"1px solid var(--line)",textAlign:"center"}}>
+            <p style={{fontSize:"2rem",marginBottom:12}}>
+              {collabPopup === "kicked" ? "👋" : collabPopup === "banned" ? "🚫" : collabPopup === "closed" ? "🔒" : "⏸️"}
+            </p>
+            <p style={{fontFamily:"'Cormorant Garamond',serif",fontSize:"1.3rem",fontWeight:600,color:"var(--ink)",marginBottom:8}}>
+              {collabPopup === "kicked" ? "Kamu Dikeluarkan" : collabPopup === "banned" ? "Kamu Dibanned" : collabPopup === "closed" ? "Kolaborasi Berakhir" : "Kolaborasi Dijeda"}
+            </p>
+            <p style={{fontFamily:"'Lora',serif",fontSize:".84rem",color:"var(--ink3)",lineHeight:1.6,marginBottom:24}}>
+              {collabPopup === "kicked" ? "Pemilik catatan telah mengeluarkanmu dari sesi kolaborasi ini." : collabPopup === "banned" ? "Kamu telah dibanned oleh pemilik catatan dan tidak bisa bergabung kembali." : collabPopup === "closed" ? "Pemilik catatan telah menonaktifkan kolaborasi pada catatan ini." : "Pemilik catatan menjeda kolaborasi sementara. Kamu tidak bisa mengedit untuk sekarang."}
+            </p>
+            <button onClick={()=>setCollabPopup(null)} style={{padding:"10px 28px",borderRadius:12,border:"none",background:"var(--accent)",color:"#fff",fontFamily:"'Lora',serif",fontSize:".85rem",fontWeight:500,cursor:"pointer"}}>Mengerti</button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Collab Panel ── */}
+      {showCollabPanel && selId && (
+        <div style={{position:"fixed",inset:0,zIndex:3000,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,.45)",backdropFilter:"blur(4px)"}} onClick={()=>setShowCollabPanel(false)}>
+          <div style={{background:"var(--surface,#fff)",borderRadius:20,padding:"28px 24px",width:"min(420px,92vw)",maxHeight:"80vh",overflowY:"auto",boxShadow:"0 8px 40px rgba(0,0,0,.22)",border:"1px solid var(--line)"}} onClick={e=>e.stopPropagation()}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20}}>
+              <p style={{fontFamily:"'Cormorant Garamond',serif",fontSize:"1.35rem",fontWeight:600,color:"var(--ink)"}}>Kolaborasi</p>
+              <button onClick={()=>setShowCollabPanel(false)} style={{border:"none",background:"none",cursor:"pointer",color:"var(--ink3)",fontSize:"1.1rem",padding:4}}>✕</button>
+            </div>
+            {collabLoading ? (
+              <p style={{fontFamily:"'Lora',serif",fontSize:".82rem",color:"var(--ink3)",textAlign:"center",padding:"20px 0"}}>Memuat...</p>
+            ) : !collabInviteCode ? (
+              <div style={{textAlign:"center",padding:"12px 0"}}>
+                <p style={{fontFamily:"'Lora',serif",fontSize:".82rem",color:"var(--ink2)",marginBottom:16,lineHeight:1.6}}>Aktifkan kolaborasi untuk menulis bersama teman menggunakan tautan undangan.</p>
+                <button onClick={()=>enableCollab(selId)} style={{padding:"10px 24px",borderRadius:12,border:"none",background:"var(--accent)",color:"#fff",fontFamily:"'Lora',serif",fontSize:".85rem",fontWeight:500,cursor:"pointer"}}>Aktifkan Kolaborasi</button>
+              </div>
+            ) : (
+              <>
+                <div style={{marginBottom:20}}>
+                  <p style={{fontFamily:"'Lora',serif",fontSize:".72rem",color:"var(--ink3)",marginBottom:6,letterSpacing:".04em",textTransform:"uppercase"}}>Tautan Undangan</p>
+                  <div style={{display:"flex",gap:8,alignItems:"center"}}>
+                    <div style={{flex:1,padding:"9px 12px",borderRadius:10,border:"1px solid var(--line)",background:"var(--bg)",fontFamily:"monospace",fontSize:".78rem",color:"var(--ink2)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>
+                      {typeof window !== "undefined" ? `${window.location.origin}/collab/join/${collabInviteCode}` : `/collab/join/${collabInviteCode}`}
+                    </div>
+                    <button onClick={()=>{
+                      const url = `${window.location.origin}/collab/join/${collabInviteCode}`;
+                      navigator.clipboard.writeText(url).then(()=>{setCollabCopied(true);setTimeout(()=>setCollabCopied(false),2000);}).catch(()=>{});
+                    }} style={{padding:"9px 14px",borderRadius:10,border:"1px solid var(--line)",background:"var(--accent-soft,#f0f0f0)",color:"var(--accent)",fontFamily:"'Lora',serif",fontSize:".78rem",cursor:"pointer",flexShrink:0,fontWeight:500,whiteSpace:"nowrap"}}>
+                      {collabCopied ? "✓ Disalin!" : "Salin"}
+                    </button>
+                  </div>
+                </div>
+                <div style={{marginBottom:20}}>
+                  <p style={{fontFamily:"'Lora',serif",fontSize:".72rem",color:"var(--ink3)",marginBottom:8,letterSpacing:".04em",textTransform:"uppercase"}}>Anggota ({collabMembers.length})</p>
+                  {collabMembers.length === 0 ? (
+                    <p style={{fontFamily:"'Lora',serif",fontSize:".8rem",color:"var(--ink3)",fontStyle:"italic"}}>Belum ada anggota. Bagikan tautan undangan!</p>
+                  ) : (
+                    <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                      {collabMembers.map((m:any)=>(
+                        <div key={m.userId} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 10px",borderRadius:10,background:"var(--bg)"}}>
+                          <div style={{position:"relative",flexShrink:0}}>
+                            {m.image ? <img src={m.image} alt="" style={{width:32,height:32,borderRadius:"50%",objectFit:"cover"}}/> : <div style={{width:32,height:32,borderRadius:"50%",background:"var(--accent-soft)",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Lora',serif",fontSize:".85rem",color:"var(--accent)"}}>{(m.name||"?")[0]}</div>}
+                            <span style={{position:"absolute",bottom:0,right:0,width:9,height:9,borderRadius:"50%",background:m.online?"#22c55e":"var(--ink4,#ccc)",border:"2px solid var(--surface,#fff)"}}/>
+                          </div>
+                          <div style={{flex:1,minWidth:0}}>
+                            <p style={{fontFamily:"'Lora',serif",fontSize:".82rem",color:"var(--ink)",fontWeight:500,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{m.name}</p>
+                            <p style={{fontFamily:"'Lora',serif",fontSize:".7rem",color:"var(--ink3)"}}>{m.role === "owner" ? "Pemilik" : "Editor"} · {m.online ? "Online" : "Offline"}</p>
+                          </div>
+                          {isCollabOwner && m.role !== "owner" && !m.isBanned && (
+                            <div style={{display:"flex",gap:4}}>
+                              <button onClick={async()=>{
+                              if (ydocRef.current) {
+                                ydocRef.current.getArray('kicked').push([m.userId]);
+                              }
+                                await fetch(`/api/notes/${selId}/collab/members/${m.userId}`,{method:"DELETE"});
+                                setCollabMembers(prev => prev.filter((x:any) => x.userId !== m.userId));
+                              }} style={{border:"none",background:"none",cursor:"pointer",color:"var(--ink3)",fontSize:".72rem",padding:"4px 8px",borderRadius:6,fontFamily:"'Lora',serif"}} title="Keluarkan">Keluarkan</button>
+                              <button onClick={()=>banMember(selId, m.userId)} style={{border:"none",background:"none",cursor:"pointer",color:"#c0392b",fontSize:".72rem",padding:"4px 8px",borderRadius:6,fontFamily:"'Lora',serif"}} title="Ban">Ban</button>
+                            </div>
+                          )}
+                          {m.isBanned && (
+                            <span style={{fontSize:".68rem",color:"#c0392b",fontFamily:"'Lora',serif",padding:"2px 8px",borderRadius:6,background:"#fff0f0"}}>Dibanned</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {isCollabOwner && (
+                  <div style={{borderTop:"1px solid var(--line)",paddingTop:16,display:"flex",flexDirection:"column",gap:8}}>
+                    <button onClick={()=>togglePauseCollab(selId, !collabPaused)} style={{width:"100%",padding:"9px",borderRadius:10,border:"1px solid var(--line)",background:collabPaused?"#e8f5e9":"var(--bg)",color:collabPaused?"#27ae60":"var(--ink2)",fontFamily:"'Lora',serif",fontSize:".8rem",cursor:"pointer",fontWeight:500}}>
+                      {collabPaused ? "Lanjutkan Kolaborasi" : "Jeda Kolaborasi"}
+                    </button>
+                    <button onClick={()=>disableCollab(selId)} style={{width:"100%",padding:"9px",borderRadius:10,border:"1px solid #e88",background:"#fff0f0",color:"#c0392b",fontFamily:"'Lora',serif",fontSize:".8rem",cursor:"pointer",fontWeight:500}}>
+                      Matikan Kolaborasi
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* ── Mini Music Player ── */}
       {/* Hidden YouTube iframe (audio-only mode) */}
       {(view==="read"||view==="write") && isYouTubeSong && entry?.songId && (
@@ -6393,6 +7687,11 @@ export default function DiaryApp() {
                                  {e.stickers?.length>0 && <span style={{fontSize:".7rem",opacity:.7}}>{e.stickers.slice(0,3).join("")}</span>}
                                </div>
                                <div style={{display:"flex",alignItems:"center",gap:5}}>
+                                 {e.isCollab && (
+                                   <span style={{fontFamily:"'Lora',serif",fontSize:".62rem",padding:"1px 6px",borderRadius:6,background:"rgba(196,149,106,.1)",color:"var(--accent)",fontWeight:600,border:"1px solid rgba(196,149,106,.3)",display:"inline-flex",alignItems:"center",gap:3}}>
+                                     🤝 Kolaborasi
+                                   </span>
+                                 )}
                                  {e.isModerated && (
                                    <span style={{fontFamily:"'Lora',serif",fontSize:".62rem",padding:"1px 6px",borderRadius:6,background:"#FFF0F0",color:"#B85050",fontWeight:600,border:"1px solid #FFCDCD",display:"inline-flex",alignItems:"center",gap:3}}>
                                      🛡️ Dibatasi Admin
@@ -6454,6 +7753,11 @@ export default function DiaryApp() {
                              {sameDay>1 && <span style={{fontFamily:"'Lora',serif",fontSize:".6rem",color:"var(--ink2)",background:"var(--surface2)",borderRadius:8,padding:"1px 6px"}}>{timeStr(e.ts)}</span>}
                            </div>
                            <div style={{display:"flex",alignItems:"center",gap:6}}>
+                             {e.isCollab && (
+                               <span style={{fontFamily:"'Lora',serif",fontSize:".62rem",padding:"1px 4px",borderRadius:4,background:"transparent",color:"var(--accent)",fontWeight:600,border:"1px solid var(--accent)",display:"inline-flex",alignItems:"center",gap:3}}>
+                                 🤝 Kolab
+                               </span>
+                             )}
                              {e.isModerated && (
                                <span style={{fontFamily:"'Lora',serif",fontSize:".62rem",padding:"1px 5px",borderRadius:5,background:"#FFF0F0",color:"#B85050",fontWeight:600,border:"1px solid #FFCDCD",display:"inline-flex",alignItems:"center",gap:3}}>
                                  🛡️ Dibatasi Admin
@@ -6587,8 +7891,11 @@ export default function DiaryApp() {
                         {NOTE_THEMES.filter((t:any)=>!(t.seasonal==='ramadan'&&!isRamadan)||(entry.theme===t.id)).map((t:any)=>{
                           const isAct=entry.theme===t.id;
                           return (
-                            <button key={t.id} onClick={()=>{upd("theme",isAct?"":t.id);close();}} style={{display:"flex",alignItems:"center",gap:8,padding:"7px 9px",borderRadius:9,border:`1.5px solid ${isAct?t.accent:"transparent"}`,background:isAct?t.bg:"transparent",cursor:"pointer",transition:"all .12s",textAlign:"left" as const}}>
-                              <span style={{fontSize:".9rem"}}>{t.emoji}</span>
+                            <button key={t.id} onClick={()=>{upd("theme",isAct?"":t.id);close();}} style={{display:"flex",alignItems:"center",gap:8,padding:"6px 8px",borderRadius:9,border:`1.5px solid ${isAct?t.accent:"transparent"}`,background:isAct?t.bg:"transparent",cursor:"pointer",transition:"all .12s",textAlign:"left" as const}}>
+                              <div style={{width:30,height:30,borderRadius:6,background:t.bg,border:`1px solid ${t.accent}22`,position:"relative",overflow:"hidden",flexShrink:0}}>
+                                <CardThemeBg themeId={t.id} accent={t.accent}/>
+                                <span style={{position:"absolute",bottom:1,right:1,fontSize:".55rem",zIndex:1}}>{t.emoji}</span>
+                              </div>
                               <div>
                                 <p style={{fontFamily:"'Lora',serif",fontSize:".75rem",color:isAct?t.accent:"var(--ink2)",fontWeight:isAct?600:400,lineHeight:1.2}}>
                                   {t.label}{t.seasonal==='ramadan'&&<span style={{marginLeft:5,fontSize:".6rem",background:`${t.accent}22`,color:t.accent,padding:"1px 5px",borderRadius:4,fontWeight:500}}>Ramadan</span>}
@@ -6727,6 +8034,10 @@ export default function DiaryApp() {
                 <button className="wtbtn" onClick={()=>setFocusMode(true)} style={{gap:4}} title="Mode Fokus (Esc untuk keluar)">
                   <Ic d={IC.focus} size={14} sw={1.5}/>Fokus
                 </button>
+                <button className={`wtbtn${collabEnabled?" wact":""}`} onClick={()=>{if(!selId)return;setShowCollabPanel(true);loadCollabPanel(selId);}} style={{gap:4}} title="Kolaborasi">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M19 11a4 4 0 0 1 0 8"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
+                  Kolaborasi{collabMembers.length>0?` (${collabMembers.length})`:""}
+                </button>
                 {entry.text?.trim() && (
                   <button className="wtbtn wact" onClick={()=>nav("read",selId)} style={{fontWeight:500,marginLeft:4}}>
                     Selesai ✓
@@ -6755,8 +8066,11 @@ export default function DiaryApp() {
                   {NOTE_THEMES.filter((t:any)=>!(t.seasonal==='ramadan'&&!isRamadan)||(entry.theme===t.id)).map(t=>{
                     const isActive = entry.theme===t.id;
                     return (
-                      <button key={t.id} onClick={()=>upd("theme", isActive ? '' : t.id)} style={{display:"flex",alignItems:"center",gap:8,padding:"7px 10px",borderRadius:9,border:`1.5px solid ${isActive?t.accent:"var(--line)"}`,background:isActive?t.bg:"transparent",cursor:"pointer",transition:"all .15s",textAlign:"left"}}>
-                        <span style={{fontSize:".95rem"}}>{t.emoji}</span>
+                      <button key={t.id} onClick={()=>upd("theme", isActive ? '' : t.id)} style={{display:"flex",alignItems:"center",gap:9,padding:"6px 9px",borderRadius:10,border:`1.5px solid ${isActive?t.accent:"var(--line)"}`,background:isActive?t.bg:"transparent",cursor:"pointer",transition:"all .15s",textAlign:"left"}}>
+                        <div style={{width:38,height:38,borderRadius:7,background:t.bg,border:`1px solid ${t.accent}22`,position:"relative",overflow:"hidden",flexShrink:0}}>
+                          <CardThemeBg themeId={t.id} accent={t.accent}/>
+                          <span style={{position:"absolute",bottom:1,right:2,fontSize:".65rem",zIndex:1}}>{t.emoji}</span>
+                        </div>
                         <div>
                           <p style={{fontFamily:"'Lora',serif",fontSize:".75rem",color:isActive?t.accent:"var(--ink2)",fontWeight:isActive?600:400,lineHeight:1.2}}>
                             {t.label}{(t as any).seasonal==='ramadan'&&<span style={{marginLeft:5,fontSize:".58rem",background:`${t.accent}22`,color:t.accent,padding:"1px 4px",borderRadius:3,fontWeight:500}}>Ramadan</span>}
@@ -6824,7 +8138,7 @@ export default function DiaryApp() {
                 </button>
               </div>
               <div style={{marginBottom:20}}>
-                <p style={{fontFamily:"'Lora',serif",fontSize:".68rem",color:"var(--ink3)",marginBottom:8,letterSpacing:".06em",textTransform:"uppercase"}}>Perasaan</p>
+                {/* <p style={{fontFamily:"'Lora',serif",fontSize:".68rem",color:"var(--ink3)",marginBottom:8,letterSpacing:".06em",textTransform:"uppercase"}}>Perasaan</p> */}
                 <div className="mood-grid">
                   {MOODS.map((m,i) => (
                     <button key={i} className="mood-chip" onClick={()=>upd("mood",entry.mood===i?null:i)} style={{border:entry.mood===i?`1.5px solid ${m.color}`:undefined,background:entry.mood===i?m.bg:undefined,color:entry.mood===i?m.color:"var(--ink2)",fontWeight:entry.mood===i?500:400,transition:"all .18s"}}><span style={{fontSize:"1rem"}}>{m.emoji}</span>{m.label}</button>
@@ -6842,7 +8156,18 @@ export default function DiaryApp() {
                 </div>
               )}
 
-              <LiveEditor entries={entries} text={entry.text||""} onChange={t=>upd("text",t)} onUploadImage={uploadImage} onDone={()=>nav("read",selId)} onShowToast={showInfoToast} placeholder={getPrompt(entry.date)} autoFocus fontSize={fontSizeRem} fontFamily={entryFontFamily(entry)}/>
+              <div style={{position:"relative"}}>
+                <LiveEditor key={selId} entries={entries} text={entry.text||""} onChange={collabEnabled && collabPaused && !isCollabOwner ? ()=>{} : t=>upd("text",t)} onUploadImage={uploadImage} onDone={()=>nav("read",selId)} onShowToast={showInfoToast} placeholder={getPrompt(entry.date)} autoFocus fontSize={fontSizeRem} fontFamily={entryFontFamily(entry)} remoteCursors={collabEnabled?remoteCursors:{}} onCursorChange={collabEnabled?(c)=>{localCursorRef.current=c;if(selId)scheduleBroadcast(selId);}:undefined}/>
+
+                {collabEnabled && collabPaused && !isCollabOwner && (
+                  <div style={{position:"absolute",inset:0,zIndex:10,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(255,255,255,.55)",backdropFilter:"blur(2px)",borderRadius:12,pointerEvents:"all"}}>
+                    <div style={{textAlign:"center",padding:"16px 24px",borderRadius:14,background:"var(--surface,#fff)",boxShadow:"0 4px 20px rgba(0,0,0,.12)",border:"1px solid var(--line)"}}>
+                      <p style={{fontSize:"1.2rem",marginBottom:6}}>⏸️</p>
+                      <p style={{fontFamily:"'Lora',serif",fontSize:".85rem",color:"var(--ink2)",fontWeight:500}}>Kolaborasi dijeda oleh pemilik</p>
+                    </div>
+                  </div>
+                )}
+              </div>
 
               <div className="mob-only" style={{marginTop:22,justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8,paddingTop:14,borderTop:"1px solid var(--line)"}}>
                 <div style={{display:"flex",alignItems:"center",gap:10}}>
@@ -6982,6 +8307,20 @@ export default function DiaryApp() {
                           </div>
                         );
                       }
+                      if (blk.type === 'divider') {
+                        return (
+                          <div key={bi} style={{ margin: '14px 0', padding: '10px 0' }}>
+                            <hr style={{ border: 'none', borderTop: '1.5px solid var(--line)', margin: 0 }} />
+                          </div>
+                        );
+                      }
+                      if (blk.type === 'math') {
+                        return (
+                          <div key={bi} style={{ margin: '18px 0', padding: '8px 0', overflowX: 'auto', display: 'flex', justifyContent: 'center' }}>
+                            {renderKatex(blk.content, true)}
+                          </div>
+                        );
+                      }
                       if (blk.type === 'link') {
                         let hostname = '';
                         try { hostname = new URL(blk.url).hostname; } catch(_) {}
@@ -7022,7 +8361,7 @@ export default function DiaryApp() {
                       }
                       // text block — HTML (new) or plain markdown (legacy)
                       if (/<(?:div|br|strong|em|span|u|code|hr|s|a|pre|h[1-6])\b/i.test(blk.content)) {
-                        return <div key={bi} className="rich-read" style={{fontFamily:entryFontFamily(entry),fontSize:`${fontSizeRem}rem`,lineHeight:fontLineH,color:"var(--ink)",wordBreak:"break-word"}} dangerouslySetInnerHTML={{__html:linkZettel(blk.content)}}/>;
+                        return <div key={bi} className="rich-read" style={{fontFamily:entryFontFamily(entry),fontSize:`${fontSizeRem}rem`,lineHeight:fontLineH,color:"var(--ink)",wordBreak:"break-word"}} dangerouslySetInnerHTML={{__html:formatLatexInHtml(linkZettel(blk.content))}}/>;
                       }
                       return (
                         <div key={bi} className="rich-read">
@@ -7232,7 +8571,7 @@ export default function DiaryApp() {
             {/* Desktop: always-visible search */}
             <div className="desk-search-wrap">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" strokeWidth="1.5" strokeLinecap="round" style={{position:"absolute",left:14,top:"50%",transform:"translateY(-50%)",pointerEvents:"none"}}><path d={IC.search}/></svg>
-              <input ref={searchInputRef} className="search-bar" type="text" value={q} onChange={(e:any)=>setQ(e.target.value)} placeholder="Cari catatan atau @nama pengguna..." style={{paddingLeft:42}}/>
+              <input ref={searchInputRef} className="search-bar" type="text" value={q} onChange={(e:any)=>setQ(e.target.value)} placeholder="Cari catatan, @nama, atau kode/link kolaborasi..." style={{paddingLeft:42}}/>
             </div>
             {/* Mobile: toggle button */}
             <button className="mob-only gb" onClick={()=>setShowSearch(!showSearch)} style={{color:showSearch?"var(--accent)":"var(--ink2)"}}><Ic d={IC.search} size={17}/></button>
@@ -7241,10 +8580,31 @@ export default function DiaryApp() {
           {showSearch && (
             <div className="mob-only" style={{position:"relative",marginBottom:16,animation:"fadeUp .3s ease both"}}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" strokeWidth="1.5" strokeLinecap="round" style={{position:"absolute",left:14,top:"50%",transform:"translateY(-50%)"}}><path d={IC.search}/></svg>
-              <input className="search-bar" type="text" value={q} onChange={(e:any)=>setQ(e.target.value)} placeholder="Cari catatan atau @nama pengguna..." autoFocus/>
+              <input className="search-bar" type="text" value={q} onChange={(e:any)=>setQ(e.target.value)} placeholder="Cari catatan, @nama, atau kode/link kolaborasi..." autoFocus/>
             </div>
           )}
-          {q.startsWith("@") ? (
+          {!q.startsWith("@") && extractCollabCode(q) ? (
+            /* ── Collab join by code / URL ── */
+            <div style={{animation:"fadeUp .3s ease both"}}>
+              <p style={{fontFamily:"'Lora',serif",fontSize:".72rem",color:"var(--ink3)",marginBottom:12,letterSpacing:".04em",textTransform:"uppercase"}}>Bergabung ke Kolaborasi</p>
+              {collabJoinLoading ? (
+                <p style={{fontFamily:"'Lora',serif",fontSize:".82rem",color:"var(--ink3)"}}>Memuat informasi undangan...</p>
+              ) : collabJoinError ? (
+                <p style={{fontFamily:"'Lora',serif",fontSize:".82rem",color:"#c0392b"}}>{collabJoinError}</p>
+              ) : collabJoinPreview ? (
+                <div style={{padding:"16px",borderRadius:16,border:"1.5px solid var(--line)",background:"var(--surface)"}}>
+                  <p style={{fontFamily:"'Cormorant Garamond',serif",fontSize:"1.2rem",fontWeight:600,color:"var(--ink)",marginBottom:4}}>{collabJoinPreview.title}</p>
+                  <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
+                    {collabJoinPreview.ownerImage && <img src={collabJoinPreview.ownerImage} alt="" style={{width:20,height:20,borderRadius:"50%",objectFit:"cover"}}/>}
+                    <p style={{fontFamily:"'Lora',serif",fontSize:".78rem",color:"var(--ink3)"}}>oleh {collabJoinPreview.ownerName} · {collabJoinPreview.memberCount} anggota</p>
+                  </div>
+                  <button onClick={()=>joinCollabFromSearch(extractCollabCode(q)!)} disabled={collabJoining} style={{width:"100%",padding:"10px",borderRadius:12,border:"none",background:"var(--accent)",color:"#fff",fontFamily:"'Lora',serif",fontSize:".85rem",fontWeight:500,cursor:"pointer",opacity:collabJoining?.6:1}}>
+                    {collabJoining ? "Bergabung..." : "Bergabung & Mulai Edit"}
+                  </button>
+                </div>
+              ) : null}
+            </div>
+          ) : q.startsWith("@") ? (
             /* ── User search results ── */
             <div style={{animation:"fadeUp .3s ease both"}}>
               <p style={{fontFamily:"'Lora',serif",fontSize:".76rem",color:"var(--ink3)",marginBottom:14}}>
@@ -7327,6 +8687,11 @@ export default function DiaryApp() {
                          {sameDay>1 && <span style={{fontFamily:"'Lora',serif",fontSize:".6rem",color:dInk2,background:"var(--surface2)",borderRadius:8,padding:"1px 6px"}}>{timeStr(e.ts)}</span>}
                        </div>
                        <div style={{display:"flex",alignItems:"center",gap:6}}>
+                         {e.isCollab && (
+                           <span style={{fontFamily:"'Lora',serif",fontSize:".62rem",padding:"1px 5px",borderRadius:5,background:"rgba(196,149,106,.1)",color:"var(--accent)",fontWeight:600,border:"1px solid rgba(196,149,106,.3)",display:"inline-flex",alignItems:"center",gap:3}}>
+                             🤝 Kolab
+                           </span>
+                         )}
                          {eTheme && !isLocked && <span style={{fontFamily:"'Lora',serif",fontSize:".62rem",padding:"1px 5px",borderRadius:5,background:`${eTheme.accent}1A`,color:eTheme.accent,fontWeight:500,border:`1px solid ${eTheme.accent}30`}}>{eTheme.emoji} {eTheme.label}</span>}
                          {e.stickers?.length>0 && <span style={{fontSize:".6rem",opacity:.6}}>{e.stickers.slice(0,2).join("")}</span>}
                          {m&&<span style={{fontSize:".85rem"}}>{m.emoji}</span>}
@@ -7858,16 +9223,20 @@ export default function DiaryApp() {
                   <p style={{fontFamily:"'Lora',serif",fontSize:".82rem",color:"var(--ink2)",marginBottom:14,fontWeight:500,letterSpacing:".02em"}}>Tema Warna Aplikasi</p>
                   <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(108px,1fr))",gap:10}}>
                     {([
-                      { id:"default", label:"Cokelat Hangat", bg:"#FAF6F0", surface:"#FFFFFF", accent:"#C4956A", line:"#EDE7DF", ink:"#2E2520" },
-                      { id:"sage",    label:"Sage Hijau",     bg:"#F2F7F4", surface:"#FFFFFF", accent:"#4A8A64", line:"#D0E4D8", ink:"#1E2E24" },
-                      { id:"ocean",   label:"Biru Laut",      bg:"#EDF6FF", surface:"#FFFFFF", accent:"#3D7FBF", line:"#B4CCE8", ink:"#1A2E42" },
-                      { id:"peach",   label:"Sorbet Persik",  bg:"#FFF7F3", surface:"#FFFFFF", accent:"#E8541A", line:"#F5CEBC", ink:"#2D1208" },
-                      { id:"dark",    label:"One Dark",       bg:"#282C34", surface:"#21252B", accent:"#61AFEF", line:"#3E4451", ink:"#ABB2BF" },
-                      { id:"violet",  label:"Malam Ungu",     bg:"#1A1525", surface:"#221D30", accent:"#A78BFA", line:"#362D4A", ink:"#E5E0F8" },
-                      { id:"slate",   label:"Granit Biru",    bg:"#0D1117", surface:"#161B22", accent:"#38BDF8", line:"#30363D", ink:"#E6EDF3" },
+                      { id:"default",   label:"Cokelat Hangat", bg:"#FAF6F0", surface:"#FFFFFF", accent:"#C4956A", line:"#EDE7DF", ink:"#2E2520" },
+                      { id:"sage",      label:"Sage Hijau",     bg:"#F2F7F4", surface:"#FFFFFF", accent:"#4A8A64", line:"#D0E4D8", ink:"#1E2E24" },
+                      { id:"matcha",    label:"Matcha Latte",   bg:"#F4F7F4", surface:"#FFFFFF", accent:"#4C7C54", line:"#DCEAE0", ink:"#1A2E1E" },
+                      { id:"ocean",     label:"Biru Laut",      bg:"#EDF6FF", surface:"#FFFFFF", accent:"#3D7FBF", line:"#B4CCE8", ink:"#1A2E42" },
+                      { id:"sunset",    label:"Warm Sunset",    bg:"#FFF5ED", surface:"#FFFFFF", accent:"#E07A5F", line:"#F6E4DA", ink:"#3D1A10" },
+                      { id:"peach",     label:"Sorbet Persik",  bg:"#FFF7F3", surface:"#FFFFFF", accent:"#E8541A", line:"#F5CEBC", ink:"#2D1208" },
+                      { id:"dark",      label:"One Dark",       bg:"#282C34", surface:"#21252B", accent:"#61AFEF", line:"#3E4451", ink:"#ABB2BF" },
+                      { id:"violet",    label:"Malam Ungu",     bg:"#1A1525", surface:"#221D30", accent:"#A78BFA", line:"#362D4A", ink:"#E5E0F8" },
+                      { id:"cyberpunk", label:"Cyberpunk Neo",  bg:"#0D0E15", surface:"#151622", accent:"#FF007F", line:"#2A2C3F", ink:"#00FFFF" },
+                      { id:"slate",     label:"Granit Biru",    bg:"#0D1117", surface:"#161B22", accent:"#38BDF8", line:"#30363D", ink:"#E6EDF3" },
+                      { id:"glass",     label:"Frosted Glass",  bg:"#0E1525", surface:"rgba(255, 255, 255, 0.035)", accent:"#8B5CF6", line:"rgba(255, 255, 255, 0.08)", ink:"#F3F4F6" },
                     ] as const).map(t => {
                       const isAct = appTheme === t.id;
-                      const icon: Record<string, JSX.Element> = {
+                      const icon: Record<string, React.ReactNode> = {
                         default: (
                           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={t.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M17 8h1a4 4 0 010 8h-1"/><path d="M3 8h14v9a4 4 0 01-4 4H7a4 4 0 01-4-4V8z"/><path d="M6 2v2M10 2v2M14 2v2"/>
@@ -7878,9 +9247,19 @@ export default function DiaryApp() {
                             <path d="M12 22V12"/><path d="M5 12C5 6 12 3 20 6c-2 6-8 8-15 6z"/>
                           </svg>
                         ),
+                        matcha: (
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={t.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
+                          </svg>
+                        ),
                         ocean: (
                           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={t.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M2 10c2-3.5 5-3.5 7 0s5 3.5 7 0M2 17c2-3.5 5-3.5 7 0s5 3.5 7 0"/>
+                          </svg>
+                        ),
+                        sunset: (
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={t.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M12 2v3M4.22 4.22l2.12 2.12M19.78 4.22l-2.12 2.12M2 12h3M19 12h3M12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5"/>
                           </svg>
                         ),
                         peach: (
@@ -7898,9 +9277,19 @@ export default function DiaryApp() {
                             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                           </svg>
                         ),
+                        cyberpunk: (
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={t.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                          </svg>
+                        ),
                         slate: (
                           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={t.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                             <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="8.5" x2="22" y2="8.5"/>
+                          </svg>
+                        ),
+                        glass: (
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={t.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/>
                           </svg>
                         ),
                       };
@@ -8938,6 +10327,10 @@ export default function DiaryApp() {
               <Ic d={entry.isLocked?IC.lock:IC.unlock} size={20} sw={1.8} color={entry.isLocked?"var(--accent)":"var(--ink2)"}/>
               <span style={{color:entry.isLocked?"var(--accent)":"var(--ink)"}}>{entry.isLocked?"Lepas Kunci":"Kunci Catatan"}</span>
             </button>
+            <button className="asheet-row" onClick={()=>{setShowMobActions(false);if(selId){setShowCollabPanel(true);loadCollabPanel(selId);}}}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={collabEnabled?"var(--accent)":"var(--ink2)"} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M19 11a4 4 0 0 1 0 8"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
+              <span style={{color:collabEnabled?"var(--accent)":"var(--ink)"}}>Kolaborasi{collabMembers.length>0?` (${collabMembers.length})`:""}</span>
+            </button>
             {view==="read" && (
               <button className="asheet-row" onClick={()=>{setShowMobActions(false);nav("write",selId);}}>
                 <Ic d={IC.edit} size={20} sw={1.8} color="var(--ink2)"/>
@@ -8982,13 +10375,22 @@ export default function DiaryApp() {
                   const isActive=entry.theme===t.id;
                   return (
                     <button key={t.id} onClick={()=>upd("theme",isActive?'':t.id)}
-                      style={{display:"flex",alignItems:"center",gap:10,padding:"12px 14px",borderRadius:12,border:`1.5px solid ${isActive?t.accent:"var(--line)"}`,background:isActive?t.bg:"var(--surface)",cursor:"pointer",transition:"all .15s",textAlign:"left"}}>
-                      <span style={{fontSize:"1.2rem"}}>{t.emoji}</span>
-                      <div>
-                        <p style={{fontFamily:"'Lora',serif",fontSize:".8rem",color:isActive?t.accent:"var(--ink)",fontWeight:isActive?600:400,lineHeight:1.2}}>
-                          {t.label}{(t as any).seasonal==='ramadan'&&<span style={{display:"block",fontSize:".58rem",background:`${t.accent}22`,color:t.accent,padding:"1px 5px",borderRadius:3,marginTop:1,fontWeight:500,width:"fit-content"}}>🌙 Ramadan</span>}
-                        </p>
-                        <p style={{fontFamily:"'Lora',serif",fontSize:".68rem",color:"var(--ink3)",lineHeight:1.2}}>{t.desc}</p>
+                      style={{display:"flex",flexDirection:"column",gap:7,padding:"10px",borderRadius:14,border:`2px solid ${isActive?t.accent:"var(--line)"}`,background:isActive?t.bg:"var(--surface)",cursor:"pointer",transition:"all .18s",textAlign:"left",position:"relative",overflow:"hidden",boxShadow:isActive?`0 0 0 1px ${t.accent}30,0 4px 14px ${t.accent}20`:"none"}}>
+                      <div style={{width:"100%",height:52,borderRadius:8,background:t.bg,border:`1px solid ${t.accent}22`,position:"relative",overflow:"hidden"}}>
+                        <CardThemeBg themeId={t.id} accent={t.accent}/>
+                        <div style={{position:"absolute",top:9,left:8,right:26,height:3.5,borderRadius:3,background:t.accent,opacity:.2,zIndex:1}}/>
+                        <div style={{position:"absolute",top:16,left:8,width:"50%",height:3,borderRadius:3,background:t.accent,opacity:.12,zIndex:1}}/>
+                        <div style={{position:"absolute",top:23,left:8,width:"35%",height:3,borderRadius:3,background:t.accent,opacity:.08,zIndex:1}}/>
+                        <span style={{position:"absolute",top:6,right:6,fontSize:".9rem",zIndex:1}}>{t.emoji}</span>
+                      </div>
+                      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                        <div>
+                          <p style={{fontFamily:"'Lora',serif",fontSize:".74rem",color:isActive?t.accent:"var(--ink)",fontWeight:isActive?600:400,lineHeight:1.2,margin:0}}>
+                            {t.label}{(t as any).seasonal==='ramadan'&&<span style={{display:"block",fontSize:".58rem",background:`${t.accent}22`,color:t.accent,padding:"1px 5px",borderRadius:3,marginTop:1,fontWeight:500,width:"fit-content"}}>🌙 Ramadan</span>}
+                          </p>
+                          <p style={{fontFamily:"'Lora',serif",fontSize:".63rem",color:"var(--ink3)",lineHeight:1.2,margin:0}}>{t.desc}</p>
+                        </div>
+                        {isActive&&<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={t.accent} strokeWidth="3.5" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>}
                       </div>
                     </button>
                   );

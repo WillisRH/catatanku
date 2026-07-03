@@ -2,6 +2,7 @@ import { ImageResponse } from "next/og";
 import { prisma } from "@/lib/prisma";
 import { decrypt } from "@/lib/encryption";
 import { calcReadingTime } from "@/lib/note-utils";
+import { cached, CK } from "@/lib/redis";
 
 export const alt = "Catatanku";
 export const size = { width: 1200, height: 630 };
@@ -273,7 +274,11 @@ function getPreview(text: string, maxLen = 220): string {
 export default async function OGImage({ params }: { params: Promise<{ shareId: string }> }) {
   const { shareId } = await params;
   // @ts-ignore
-  const note = await prisma.note.findUnique({ where: { shareId } as any });
+  const note = await cached(CK.sharedNote(shareId), async () => {
+    const res = await prisma.note.findFirst({ where: { OR: [{ shareId }, { id: shareId, isProfilePinned: true }] } as any });
+    if (!res) return null;
+    return { ...res, ts: res.ts ? res.ts.toString() : null };
+  }, 30);
 
   const fallback = (
     <div style={{ width: "100%", height: "100%", background: "#FAF6F0", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Georgia, serif" }}>

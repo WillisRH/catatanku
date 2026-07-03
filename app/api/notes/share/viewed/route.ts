@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import admin from "@/lib/firebase-admin";
+import { invalidate, CK } from "@/lib/redis";
+import { decrypt } from "@/lib/encryption";
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,22 +23,42 @@ export async function POST(req: NextRequest) {
       data: { shareId: null, isOneTime: false }
     });
 
+    const keys = [
+      CK.note(note.id),
+      CK.userNotes(note.userId),
+      CK.sharedNote(note.id),
+      shareId ? CK.sharedNote(shareId) : "",
+      CK.sharedUserNotes(note.userId),
+    ].filter(Boolean);
+    await invalidate(...keys);
+
     // Notify owner
     const tokens = note.user.fcmTokens.map(t => t.token);
     if (tokens.length > 0) {
+      const rawTitle = decrypt(note.title || "");
+      const titleStr = rawTitle ? `"${rawTitle}"` : "Sekali Lihat";
+      const notifTitle = "Catatan Dibaca";
+      const notifBody = `Catatan Sekali Lihat ${titleStr} kamu baru saja dibaca dan tautannya telah hangus secara otomatis.`;
       const message = {
         notification: {
-          title: "Catatan Dibaca",
-          body: `Catatan "Sekali Lihat" kamu baru saja dibaca dan tautannya telah hangus secara otomatis.`,
+          title: notifTitle,
+          body: notifBody,
+        },
+        data: {
+          title: notifTitle,
+          body: notifBody,
         },
         tokens
       };
-      // Note: In real world, we might want to decrypt the title first, 
-      // but we don't have the user's secret key here (it's usually handled by the client or a vault).
-      // For now, we'll just say "Catatan Sekali Lihat kamu".
       
       try {
-        await admin.messaging().sendEachForMulticast(message);
+        const result = await admin.messaging().sendEachForMulticast(message);
+        console.log("[FCM] sent:", result.successCount, "success,", result.failureCount, "failures");
+        result.responses.forEach((resp, idx) => {
+          if (!resp.success) {
+            console.error(`[FCM] token[${idx}] error:`, resp.error?.code, resp.error?.message);
+          }
+        });
       } catch (err) {
         console.error("FCM Error:", err);
       }

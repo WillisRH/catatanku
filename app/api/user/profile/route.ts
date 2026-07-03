@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { cached, invalidate, invalidatePrefix, CK } from "@/lib/redis";
 
 const VALID_MEDALS = [
   "pioneer", "writer", "chronicler", "legend", "streak3", "streak7", "streak30",
@@ -12,14 +13,16 @@ export async function GET() {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const users: any[] = await prisma.$queryRaw`
-    SELECT id, name, username, email, image, "profileTheme", "createdAt", "currentStreak", "longestStreak", medals, "companionType", "companionName", "emailVerified", bio, instagram, twitter, tiktok, "isPrivate", "displayedMedal",
-           (password IS NOT NULL) AS "hasPassword"
-    FROM "User"
-    WHERE id = ${session.user.id}
-    LIMIT 1
-  `;
-  const user = users[0];
+  const user = await cached(CK.userProfile(session.user.id), async () => {
+    const users: any[] = await prisma.$queryRaw`
+      SELECT id, name, username, email, image, "profileTheme", "createdAt", "currentStreak", "longestStreak", medals, "companionType", "companionName", "emailVerified", bio, instagram, twitter, tiktok, "isPrivate", "displayedMedal",
+             (password IS NOT NULL) AS "hasPassword"
+      FROM "User"
+      WHERE id = ${session.user!.id}
+      LIMIT 1
+    `;
+    return users[0] || null;
+  }, 60);
 
   if (!user) return NextResponse.json({ error: "Not found" }, { status: 404 });
   return NextResponse.json(user);
@@ -85,6 +88,9 @@ export async function PATCH(req: Request) {
     session.user.id,
     ...values
   );
+
+  // Invalidate all profile caches
+  await invalidate(CK.userProfile(session.user.id), CK.publicProfile(session.user.id), CK.userPage(session.user.id));
 
   return NextResponse.json({ success: true });
 }

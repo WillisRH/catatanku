@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { cached, CK } from "@/lib/redis";
 
 function getPrevDay(dateStr: string): string {
   const [y, m, d] = dateStr.split("-").map(Number);
@@ -102,17 +103,19 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Missing or invalid today param" }, { status: 400 });
   }
 
-  const notes = await prisma.note.findMany({
-    where: { userId: session.user.id },
-    select: { date: true },
-  });
+  const result = await cached(CK.streak(session.user.id, today), async () => {
+    const notes = await prisma.note.findMany({
+      where: { userId: session.user!.id },
+      select: { date: true },
+    });
 
-  const noteDates = notes.map((n) => n.date).filter((d) => d <= today);
-  const result = calculateStreak(noteDates, today);
+    const noteDates = notes.map((n) => n.date).filter((d) => d <= today);
+    return calculateStreak(noteDates, today);
+  }, 120);
 
   // Fire-and-forget cache update
   prisma.user.update({
-    where: { id: session.user.id },
+    where: { id: session.user!.id },
     data: {
       currentStreak: result.currentStreak,
       longestStreak: result.longestStreak,

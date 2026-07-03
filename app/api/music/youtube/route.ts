@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cached, CK } from "@/lib/redis";
 
 function extractYouTubeId(url: string): string | null {
   const patterns = [
@@ -21,18 +22,23 @@ export async function GET(req: Request) {
   if (!videoId) return NextResponse.json({ error: "Invalid YouTube URL" }, { status: 400 });
 
   try {
-    const oEmbed = await fetch(
-      `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`
-    );
-    if (!oEmbed.ok) return NextResponse.json({ error: "Video not found" }, { status: 404 });
-    const data = await oEmbed.json();
-    return NextResponse.json({
-      id: `yt_${videoId}`,
-      videoId,
-      title: data.title || "",
-      author: data.author_name || "",
-      thumbnail: `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`,
-    });
+    const result = await cached(CK.youtubeOembed(videoId), async () => {
+      const oEmbed = await fetch(
+        `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`
+      );
+      if (!oEmbed.ok) return null;
+      const data = await oEmbed.json();
+      return {
+        id: `yt_${videoId}`,
+        videoId,
+        title: data.title || "",
+        author: data.author_name || "",
+        thumbnail: `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`,
+      };
+    }, 600); // 10 min TTL
+
+    if (!result) return NextResponse.json({ error: "Video not found" }, { status: 404 });
+    return NextResponse.json(result);
   } catch {
     return NextResponse.json({ error: "Failed to fetch" }, { status: 500 });
   }
